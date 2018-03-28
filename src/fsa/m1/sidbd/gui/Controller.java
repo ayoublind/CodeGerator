@@ -3,6 +3,8 @@ package fsa.m1.sidbd.gui;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import org.w3c.dom.ls.LSInput;
+
 import fsa.m1.sidbd.model.Component;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,6 +13,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.Pane;
 
 public class Controller implements Initializable{
@@ -33,10 +37,14 @@ public class Controller implements Initializable{
 		data.add(new Component("file:resources/dart-board.png", "label"));
 		data.add(new Component("file:resources/play-button.png", "TextArea"));
 
-		list_components.setDisable(false);
 
+		list_components.setCellFactory(new ComponentsCell());
 		list_components.setItems(data);
-		list_components.setCellFactory(p -> new ComponentsCell());
+		list_components.getSelectionModel().selectedItemProperty().addListener(e->{
+			Component c = list_components.getSelectionModel().getSelectedItem();
+			System.out.println(c.getName());
+		});
+
 	}
 	//les handllers : evenements pour manipuler les buttons
 	public void HandleAttribuer(){
