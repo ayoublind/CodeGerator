@@ -13,7 +13,7 @@ public class Main extends Application {
 		try {
 			FXMLLoader loader=new FXMLLoader(getClass().getResource("MainAppView.fxml"));
 			BorderPane root = (BorderPane) loader.load();
-			Controller controllerEmp = loader.getController();
+			//Controller controller = loader.getController();
 
 	        primaryStage.setTitle("Projet IDM");
 	        primaryStage.setScene(new Scene(root));

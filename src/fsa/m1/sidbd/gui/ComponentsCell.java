@@ -12,7 +12,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
 public class ComponentsCell implements Callback<ListView<Component>, ListCell<Component>> {

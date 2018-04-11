@@ -1,6 +1,11 @@
 package fsa.m1.sidbd.model;
 
-public class Component {
+import java.io.Serializable;
+
+public class Component implements Serializable{
+
+	private static final long serialVersionUID = 1L;
+
 	private String imageUrl;
 	private String name;
 
