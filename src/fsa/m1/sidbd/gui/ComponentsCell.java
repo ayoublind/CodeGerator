@@ -72,7 +72,7 @@ public class ComponentsCell implements Callback<ListView<Component>, ListCell<Co
 	        }
 	        //  set user data. like android's setTag(Object).
 	        itemRoot.setUserData(app);
-	        label_AppName.setText(app.getName());
+	        label_AppName.setText(app.toString());
 	        imgv_AppIcon.setImage(new Image(app.getImageUrl()));
 
 	        setGraphic(itemRoot);

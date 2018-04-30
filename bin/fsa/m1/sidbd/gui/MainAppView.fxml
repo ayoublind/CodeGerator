@@ -1,54 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="493.0" prefWidth="826.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fsa.m1.sidbd.gui.Controller">
-   <center>
-      <AnchorPane prefHeight="468.0" prefWidth="611.0" BorderPane.alignment="CENTER">
-         <children>
-            <ListView fx:id="ls_attribues" layoutX="400.0" layoutY="27.0" prefHeight="319.0" prefWidth="184.0" />
-            <Label layoutX="401.0" layoutY="10.0" text="Les attributs :" />
-            <Pane fx:id="panel" layoutX="11.0" layoutY="33.0" prefHeight="365.0" prefWidth="369.0" style="-fx-background-color: #ef4;" />
-            <Label layoutX="11.0" layoutY="10.0" text="Espace de travail :" />
-            <Button fx:id="btn_supprimer" layoutX="91.0" layoutY="413.0" mnemonicParsing="false" onAction="#HandleSupprimer" text="Supprimer">
-               <graphic>
-                  <ImageView>
-                     <image>
-                        <Image url="@../../../../../resources/delete.png" />
-                     </image>
-                  </ImageView>
-               </graphic>
-            </Button>
-            <Button fx:id="btn_generer" layoutX="289.0" layoutY="413.0" mnemonicParsing="false" onAction="#HandleGenerer" text="Generer">
-               <graphic>
-                  <ImageView>
-                     <image>
-                        <Image url="@../../../../../resources/play-button.png" />
-                     </image>
-                  </ImageView>
-               </graphic>
-            </Button>
-            <Button fx:id="btn_attribuer" layoutX="442.0" layoutY="358.0" mnemonicParsing="false" onAction="#HandleAttribuer" text="Attribuer">
-               <graphic>
-                  <ImageView>
-                     <image>
-                        <Image url="@../../../../../resources/dart-board.png" />
-                     </image>
-                  </ImageView>
-               </graphic>
-            </Button>
-         </children></AnchorPane>
-   </center>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="529.0" prefWidth="919.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fsa.m1.sidbd.gui.Controller">
    <top>
       <MenuBar fx:id="menu_bar" BorderPane.alignment="CENTER">
         <menus>
@@ -78,4 +49,113 @@
          </children>
       </AnchorPane>
    </left>
+   <center>
+      <TabPane prefHeight="453.0" prefWidth="690.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <tabs>
+          <Tab text="GUI">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <VBox fx:id="panel" layoutX="159.0" layoutY="50.0" prefHeight="323.0" prefWidth="333.0" style="-fx-background-color: #3434;" />
+                        <Button fx:id="btn_attribuer" layoutX="541.0" layoutY="353.0" mnemonicParsing="false" onAction="#HandleAttribuer" text="Attribuer">
+                           <graphic>
+                              <ImageView>
+                                 <image>
+                                    <Image url="@../../../../../resources/dart-board.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button fx:id="btn_supprimer" layoutX="307.0" layoutY="381.0" mnemonicParsing="false" onAction="#HandleSupprimer">
+                           <graphic>
+                              <ImageView>
+                                 <image>
+                                    <Image url="@../../../../../resources/delete.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Label layoutX="206.0" layoutY="19.0" text="Espace de travail :" />
+                        <Label layoutX="520.0" layoutY="24.0" text="Les attributs :" />
+                        <TreeView fx:id="treeView" layoutX="11.0" layoutY="64.0" prefHeight="276.0" prefWidth="130.0" />
+                        <Label layoutX="26.0" layoutY="43.0" text="View" />
+                        <VBox layoutX="505.0" layoutY="48.0" prefHeight="297.0" prefWidth="173.0" style="-fx-background-color: #fff; -fx-border-color: #e3e3e3;">
+                           <children>
+                              <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
+                                 <children>
+                                    <Label layoutX="5.0" layoutY="12.0" text="Id :" />
+                                    <TextField disable="true" fx:id="id" layoutX="64.0" layoutY="6.0" prefHeight="25.0" prefWidth="98.0" />
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane layoutX="11.0" layoutY="11.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
+                                 <children>
+                                    <Label layoutX="5.0" layoutY="12.0" text="Texte :" />
+                                    <TextField disable="true" fx:id="texte" layoutX="64.0" layoutY="6.0" prefHeight="25.0" prefWidth="98.0" />
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane layoutX="11.0" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
+                                 <children>
+                                    <Label layoutX="5.0" layoutY="12.0" text="Color :" />
+                                    <ComboBox disable="true" fx:id="combo_color" layoutX="70.0" layoutY="6.0" prefHeight="25.0" prefWidth="94.0" />
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane layoutX="11.0" layoutY="85.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
+                                 <children>
+                                    <Label layoutX="5.0" layoutY="12.0" text="Heigth :" />
+                                    <TextField disable="true" fx:id="height" layoutX="64.0" layoutY="6.0" prefHeight="25.0" prefWidth="98.0" />
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane layoutX="11.0" layoutY="122.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
+                                 <children>
+                                    <Label layoutX="5.0" layoutY="12.0" text="Width :" />
+                                    <TextField disable="true" fx:id="width" layoutX="64.0" layoutY="6.0" prefHeight="25.0" prefWidth="98.0" />
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane layoutX="11.0" layoutY="159.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
+                                 <children>
+                                    <Label layoutX="5.0" layoutY="12.0" text="Background :" />
+                                    <Button disable="true" fx:id="bg" layoutX="108.0" layoutY="6.0" mnemonicParsing="false" text=".." />
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane layoutX="11.0" layoutY="196.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
+                                 <children>
+                                    <Label layoutX="5.0" layoutY="12.0" text="Visible :" />
+                                    <CheckBox disable="true" fx:id="ck_visible" layoutX="112.0" layoutY="10.0" mnemonicParsing="false" />
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane layoutX="11.0" layoutY="196.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
+                                 <children>
+                                    <Label layoutX="5.0" layoutY="12.0" text="Editable :" />
+                                    <CheckBox disable="true" fx:id="ck_editable" contentDisplay="RIGHT" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" />
+                                 </children>
+                              </AnchorPane>
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Code">
+               <content>
+                  <TextArea fx:id="codeTxt" prefHeight="200.0" prefWidth="200.0" />
+               </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </center>
+   <bottom>
+      <AnchorPane prefHeight="51.0" prefWidth="873.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="btn_generer" layoutX="728.0" layoutY="6.0" mnemonicParsing="false" onAction="#HandleGenerer" text="Generer">
+               <graphic>
+                  <ImageView>
+                     <image>
+                        <Image url="@../../../../../resources/play-button.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+         </children>
+      </AnchorPane>
+   </bottom>
 </BorderPane>

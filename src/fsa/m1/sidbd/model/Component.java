@@ -8,13 +8,24 @@ public class Component implements Serializable{
 
 	private String imageUrl;
 	private String name;
+	private int type;
+
+	private Component parentCompo;
 
 	//constructeur
-	public Component(String imageUrl, String name) {
+	public Component(String imageUrl, String name, int t, Component parent) {
 		super();
 		this.imageUrl = imageUrl;
 		this.name = name;
+		this.type = t;
+		this.parentCompo = parent;
 	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+
 
 
 	//getters and setters
@@ -26,6 +37,14 @@ public class Component implements Serializable{
 		this.imageUrl = imageUrl;
 	}
 
+	public Component getParentCompo() {
+		return parentCompo;
+	}
+
+	public void setParentCompo(Component parent) {
+		this.parentCompo = parent;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -34,5 +53,10 @@ public class Component implements Serializable{
 		this.name = name;
 	}
 
-
+	public int getType() {
+		return type;
+	}
+	public void setType(int type) {
+		this.type = type;
+	}
 }
