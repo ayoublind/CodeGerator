@@ -3,6 +3,7 @@ package fsa.m1.sidbd.gui;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import fsa.m1.sidbd.model.Component;
@@ -14,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -51,6 +53,8 @@ public class Controller implements Initializable{
 	@FXML private TreeView<Component> treeView;
 	@FXML private TextArea codeTxt;
 
+	@FXML private Label infos;
+
 	//attribute items
 	@FXML private TextField id, texte,width, height;
 	@FXML private CheckBox ck_editable, ck_visible;
@@ -65,6 +69,9 @@ public class Controller implements Initializable{
 
 	//la list des composants qui existe dans le workspace (dragged)
 	List<Component> listItem = new ArrayList<>();
+
+	//le choix du layout envoyer par le main
+	private String layout;
 
 
 	@Override
@@ -164,6 +171,10 @@ public class Controller implements Initializable{
 		treeView.setRoot(new TreeItem<>(parent));
 		treeView.setShowRoot(true);
 
+		treeView.getSelectionModel().selectedItemProperty().addListener(e->{
+			desactivateAttributes(false);
+			panel.setUserData(treeView.getSelectionModel().getSelectedItem().getValue());
+		});
 
 
 		//mise ajour de la liste
@@ -436,10 +447,22 @@ public class Controller implements Initializable{
 	}
 	public void HandleSupprimer(){
 		if(treeView.getSelectionModel().getSelectedItem() != null){
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setContentText("Wait ! Working progress :) ");
-			alert.setHeaderText("Wait ! Working on that !");
-			alert.showAndWait();
+
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Confirmer votre choix");
+			alert.setHeaderText("Attention, Confirmer votre choix ");
+			alert.setContentText("Est-ce que vous voulez vraiment supprimer cette composant ?");
+
+			Optional<ButtonType> result = alert.showAndWait();
+			if (result.get() == ButtonType.OK){
+				TreeItem<Component> selected = treeView.getSelectionModel().getSelectedItem();
+				treeView.getRoot().getChildren().remove(selected);
+
+				//not working !!
+				panel.getChildren().remove(panel.getUserData());
+			} else {
+
+			}
 		}else{
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setContentText("Erreur ! il faut selectionner un elt du tree avant de suppr");
@@ -562,4 +585,13 @@ public class Controller implements Initializable{
 	}
 
 
+
+
+	//getters and setters
+	public void setLayout(String layout) {
+		this.layout = layout;
+	}
+	public String getLayout() {
+		return layout;
+	}
 }

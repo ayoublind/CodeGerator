@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
@@ -17,9 +18,10 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="529.0" prefWidth="919.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fsa.m1.sidbd.gui.Controller">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="545.0" prefWidth="919.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fsa.m1.sidbd.gui.Controller">
    <top>
       <MenuBar fx:id="menu_bar" BorderPane.alignment="CENTER">
         <menus>
@@ -84,49 +86,49 @@
                               <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
                                  <children>
                                     <Label layoutX="5.0" layoutY="12.0" text="Id :" />
-                                    <TextField disable="true" fx:id="id" layoutX="64.0" layoutY="6.0" prefHeight="25.0" prefWidth="98.0" />
+                                    <TextField fx:id="id" disable="true" layoutX="64.0" layoutY="6.0" prefHeight="25.0" prefWidth="98.0" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane layoutX="11.0" layoutY="11.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
                                  <children>
                                     <Label layoutX="5.0" layoutY="12.0" text="Texte :" />
-                                    <TextField disable="true" fx:id="texte" layoutX="64.0" layoutY="6.0" prefHeight="25.0" prefWidth="98.0" />
+                                    <TextField fx:id="texte" disable="true" layoutX="64.0" layoutY="6.0" prefHeight="25.0" prefWidth="98.0" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane layoutX="11.0" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
                                  <children>
                                     <Label layoutX="5.0" layoutY="12.0" text="Color :" />
-                                    <ComboBox disable="true" fx:id="combo_color" layoutX="70.0" layoutY="6.0" prefHeight="25.0" prefWidth="94.0" />
+                                    <ComboBox fx:id="combo_color" disable="true" layoutX="70.0" layoutY="6.0" prefHeight="25.0" prefWidth="94.0" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane layoutX="11.0" layoutY="85.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
                                  <children>
                                     <Label layoutX="5.0" layoutY="12.0" text="Heigth :" />
-                                    <TextField disable="true" fx:id="height" layoutX="64.0" layoutY="6.0" prefHeight="25.0" prefWidth="98.0" />
+                                    <TextField fx:id="height" disable="true" layoutX="64.0" layoutY="6.0" prefHeight="25.0" prefWidth="98.0" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane layoutX="11.0" layoutY="122.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
                                  <children>
                                     <Label layoutX="5.0" layoutY="12.0" text="Width :" />
-                                    <TextField disable="true" fx:id="width" layoutX="64.0" layoutY="6.0" prefHeight="25.0" prefWidth="98.0" />
+                                    <TextField fx:id="width" disable="true" layoutX="64.0" layoutY="6.0" prefHeight="25.0" prefWidth="98.0" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane layoutX="11.0" layoutY="159.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
                                  <children>
                                     <Label layoutX="5.0" layoutY="12.0" text="Background :" />
-                                    <Button disable="true" fx:id="bg" layoutX="108.0" layoutY="6.0" mnemonicParsing="false" text=".." />
+                                    <Button fx:id="bg" disable="true" layoutX="108.0" layoutY="6.0" mnemonicParsing="false" text=".." />
                                  </children>
                               </AnchorPane>
                               <AnchorPane layoutX="11.0" layoutY="196.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
                                  <children>
                                     <Label layoutX="5.0" layoutY="12.0" text="Visible :" />
-                                    <CheckBox disable="true" fx:id="ck_visible" layoutX="112.0" layoutY="10.0" mnemonicParsing="false" />
+                                    <CheckBox fx:id="ck_visible" disable="true" layoutX="112.0" layoutY="10.0" mnemonicParsing="false" />
                                  </children>
                               </AnchorPane>
                               <AnchorPane layoutX="11.0" layoutY="196.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="171.0">
                                  <children>
                                     <Label layoutX="5.0" layoutY="12.0" text="Editable :" />
-                                    <CheckBox disable="true" fx:id="ck_editable" contentDisplay="RIGHT" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" />
+                                    <CheckBox fx:id="ck_editable" contentDisplay="RIGHT" disable="true" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" />
                                  </children>
                               </AnchorPane>
                            </children>
@@ -144,9 +146,14 @@
       </TabPane>
    </center>
    <bottom>
-      <AnchorPane prefHeight="51.0" prefWidth="873.0" BorderPane.alignment="CENTER">
+      <HBox prefHeight="51.0" prefWidth="919.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="btn_generer" layoutX="728.0" layoutY="6.0" mnemonicParsing="false" onAction="#HandleGenerer" text="Generer">
+            <Label fx:id="infos" text="INFORMATIONS">
+               <HBox.margin>
+                  <Insets bottom="10.0" left="10.0" top="20.0" />
+               </HBox.margin>
+            </Label>
+            <Button fx:id="btn_generer" mnemonicParsing="false" onAction="#HandleGenerer" text="Generer">
                <graphic>
                   <ImageView>
                      <image>
@@ -154,8 +161,11 @@
                      </image>
                   </ImageView>
                </graphic>
+               <HBox.margin>
+                  <Insets bottom="10.0" left="600.0" top="10.0" />
+               </HBox.margin>
             </Button>
          </children>
-      </AnchorPane>
+      </HBox>
    </bottom>
 </BorderPane>
