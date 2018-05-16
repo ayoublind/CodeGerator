@@ -5,12 +5,12 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="41.0" prefWidth="170.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="29.0" prefWidth="170.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView fx:id="item_ImageView_AppIcon" fitHeight="29.0" fitWidth="28.0" layoutX="5.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="item_ImageView_AppIcon" fitHeight="29.0" fitWidth="28.0" layoutX="4.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../../../../../resources/delete.png" />
          </image></ImageView>
-      <Label fx:id="item_Label_AppName" layoutX="93.0" layoutY="13.0" text="Label" />
+      <Label fx:id="item_Label_AppName" layoutX="63.0" layoutY="4.0" text="Label" />
    </children>
 </AnchorPane>

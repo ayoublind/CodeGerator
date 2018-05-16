@@ -1,6 +1,8 @@
 package fsa.m1.sidbd.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Component implements Serializable{
 
@@ -9,7 +11,8 @@ public class Component implements Serializable{
 	private String imageUrl;
 	private String name;
 	private int type;
-
+	private boolean isContainer;
+	private List<Component> childrens;
 	private Component parentCompo;
 
 	//constructeur
@@ -21,11 +24,24 @@ public class Component implements Serializable{
 		this.parentCompo = parent;
 	}
 
+	//constructeur
+	public Component(String imageUrl, String name, int t, Component parent, boolean iscontainer, ArrayList<Component> childrens) {
+		super();
+		this.imageUrl = imageUrl;
+		this.name = name;
+		this.type = t;
+		this.isContainer = iscontainer;
+		this.parentCompo = parent;
+
+		if(isContainer){
+			this.childrens = childrens;
+		}
+	}
+
 	@Override
 	public String toString() {
 		return name;
 	}
-
 
 
 	//getters and setters
@@ -37,6 +53,12 @@ public class Component implements Serializable{
 		this.imageUrl = imageUrl;
 	}
 
+	public boolean isContainer() {
+		return isContainer;
+	}
+	public void setContainer(boolean isContainer) {
+		this.isContainer = isContainer;
+	}
 	public Component getParentCompo() {
 		return parentCompo;
 	}
@@ -58,5 +80,13 @@ public class Component implements Serializable{
 	}
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public List<Component> getChildrens() {
+		return childrens;
+	}
+
+	public void setChildrens(List<Component> childrens) {
+		this.childrens = childrens;
 	}
 }

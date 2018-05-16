@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 import fsa.m1.sidbd.model.Component;
+import fsa.m1.sidbd.gui.DnDCell;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -38,9 +39,14 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.web.WebView;
+import javafx.util.Callback;
 
 public class Controller implements Initializable{
 
@@ -77,17 +83,22 @@ public class Controller implements Initializable{
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
-
 		//data for the composants
 		Component parent = new Component("file:resources/fenetre.png", "Fenetre", 0, null);
 
 		//adding the data to the list
 		data.add(parent);
-		data.add(new Component("file:resources/icon.png", "button", 1, parent));
-		data.add(new Component("file:resources/delete.png", "text field", 2, parent));
-		data.add(new Component("file:resources/dart-board.png", "label", 3, parent));
-		data.add(new Component("file:resources/play-button.png", "ListView", 4, parent));
-
+		data.add(new Component("file:resources/button.png", "button", 1, parent, false, null));
+		data.add(new Component("file:resources/textfield.png", "text field", 2, parent, false, null));
+		data.add(new Component("file:resources/label.png", "label", 3, parent, false, null));
+		data.add(new Component("file:resources/listview.png", "ListView", 4, parent, false, null));
+		data.add(new Component("file:resources/hbox.png", "Hbox", 5, parent, true, null));
+		data.add(new Component("file:resources/vbox.png", "Vbox", 6, parent, true, null));
+		data.add(new Component("file:resources/webview.png", "WebView", 7, parent, false, null));
+		data.add(new Component("file:resources/pane.png", "Pane", 8, parent, true, null));
+		data.add(new Component("file:resources/gridpane.png", "GridPane", 9, parent, true, null));
+		data.add(new Component("file:resources/checkbox.png", "CheckBox", 10, parent));
+		data.add(new Component("file:resources/borderPane.png", "BorderPane", 11, parent, true, null));
 
 
 		//la liste des composants
@@ -179,6 +190,23 @@ public class Controller implements Initializable{
 
 		//mise ajour de la liste
 		updateItemTree();
+
+
+		//initialise the code part with example code
+		codeTxt.setText("<frame>\n"
+				+ "\t<items>\n"
+				+ "\t\t<button id=\"\btn\">button</button>\n"
+				+ "\t</items>\n"
+				+ "\n"
+				+ "</frame>");
+
+		//drag and drop over the frame(treeview) elemnt
+		treeView.setCellFactory(new Callback<TreeView<Component>, TreeCell<Component>>() {
+            @Override
+            public TreeCell call(TreeView<Component> param) {
+                return new DnDCell(param);
+            }
+        });
 
 	}
 
@@ -402,6 +430,36 @@ public class Controller implements Initializable{
 				ListView<String> ls = new ListView<>();
 				ls.setItems(FXCollections.observableArrayList("item1","item2","item3","item4"));
 				node = ls;
+				break;
+			case 5:
+				HBox hb = new HBox();
+				hb.prefHeight(20);
+				node = hb;
+				break;
+			case 6:
+				WebView wb = new WebView();
+				wb.prefHeight(20);
+				node = wb;
+				break;
+			case 7:
+				Pane p = new Pane();
+				p.prefHeight(20);
+				node = p;
+				break;
+			case 8:
+				GridPane gp = new GridPane();
+				gp.setPrefHeight(20);
+				node = gp;
+				break;
+			case 9:
+				CheckBox ck = new CheckBox();
+
+				node = ck;
+				break;
+			case 10:
+				BorderPane bp = new BorderPane();
+				bp.setPrefHeight(20);
+				node = bp;
 				break;
 			default:
 				break;
