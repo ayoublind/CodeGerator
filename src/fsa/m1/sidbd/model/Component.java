@@ -15,22 +15,27 @@ public class Component implements Serializable{
 	private List<Component> childrens;
 	private Component parentCompo;
 
+	private List<Attribute> lsAttributes;
+
 	//constructeur
-	public Component(String imageUrl, String name, int t, Component parent) {
+	public Component(String imageUrl, String name, int t, Component parent, ArrayList<Attribute> ls) {
 		super();
 		this.imageUrl = imageUrl;
 		this.name = name;
 		this.type = t;
 		this.parentCompo = parent;
+		this.lsAttributes = ls;
 	}
 
 	//constructeur
-	public Component(String imageUrl, String name, int t, Component parent, boolean iscontainer, ArrayList<Component> childrens) {
+	public Component(String imageUrl, String name, int t, Component parent, boolean iscontainer,
+			ArrayList<Component> childrens, ArrayList<Attribute> ls) {
 		super();
 		this.imageUrl = imageUrl;
 		this.name = name;
 		this.type = t;
 		this.isContainer = iscontainer;
+		this.lsAttributes = ls;
 		this.parentCompo = parent;
 
 		if(isContainer){
@@ -44,9 +49,18 @@ public class Component implements Serializable{
 	}
 
 
+
+
 	//getters and setters
 	public String getImageUrl() {
 		return imageUrl;
+	}
+
+	public List<Attribute> getLsAttributes() {
+		return lsAttributes;
+	}
+	public void setLsAttributes(List<Attribute> lsAttributes) {
+		this.lsAttributes = lsAttributes;
 	}
 
 	public void setImageUrl(String imageUrl) {

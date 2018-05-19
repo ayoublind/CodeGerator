@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import fsa.m1.sidbd.model.Attribute;
 import fsa.m1.sidbd.model.Component;
 import fsa.m1.sidbd.gui.DnDCell;
 import javafx.collections.FXCollections;
@@ -42,9 +43,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
 
@@ -53,19 +52,19 @@ public class Controller implements Initializable{
 	@FXML private ListView<Component> list_components;
 
 	@FXML private Button btn_supprimer, btn_generer, btn_attribuer;
-	@FXML private VBox panel;
+	@FXML private AnchorPane panel;
 	@FXML private MenuBar menu_bar;
 
 	@FXML private TreeView<Component> treeView;
 	@FXML private TextArea codeTxt;
 
-	@FXML private Label infos;
+	@FXML public Label infos;
 
 	//attribute items
 	@FXML private TextField id, texte,width, height;
 	@FXML private CheckBox ck_editable, ck_visible;
 	@FXML private Button bg;
-	@FXML private ComboBox<Color> combo_color;
+	@FXML private ComboBox<String> combo_color;
 
 	// Set the Custom Data Format
 	static final DataFormat COMPONENT_LIST = new DataFormat("ComponentList");
@@ -82,28 +81,37 @@ public class Controller implements Initializable{
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		ObservableList<String> colors = FXCollections.observableArrayList("bleu","black","white","yellow");
+		combo_color.setItems(colors);
+	}
+
+	public void initialiser() {
+
+		//changer le type du maincontainer selon le type choisi par l'utilisateur
+		//changeMainContainer();
 
 		//data for the composants
-		Component parent = new Component("file:resources/fenetre.png", "Fenetre", 0, null);
+		Component parent = new Component("file:resources/fenetre.png", "Fenetre", 0, null,new ArrayList<>());
 
 		//adding the data to the list
 		data.add(parent);
-		data.add(new Component("file:resources/button.png", "button", 1, parent, false, null));
-		data.add(new Component("file:resources/textfield.png", "text field", 2, parent, false, null));
-		data.add(new Component("file:resources/label.png", "label", 3, parent, false, null));
-		data.add(new Component("file:resources/listview.png", "ListView", 4, parent, false, null));
-		data.add(new Component("file:resources/hbox.png", "Hbox", 5, parent, true, null));
-		data.add(new Component("file:resources/vbox.png", "Vbox", 6, parent, true, null));
-		data.add(new Component("file:resources/webview.png", "WebView", 7, parent, false, null));
-		data.add(new Component("file:resources/pane.png", "Pane", 8, parent, true, null));
-		data.add(new Component("file:resources/gridpane.png", "GridPane", 9, parent, true, null));
-		data.add(new Component("file:resources/checkbox.png", "CheckBox", 10, parent));
-		data.add(new Component("file:resources/borderPane.png", "BorderPane", 11, parent, true, null));
+		data.add(new Component("file:resources/button.png", "button", 1, parent, false, new ArrayList<>(),new ArrayList<>()));
+		data.add(new Component("file:resources/textfield.png", "text field", 2, parent, false, new ArrayList<>(),new ArrayList<>()));
+		data.add(new Component("file:resources/label.png", "label", 3, parent, false, new ArrayList<>(),new ArrayList<>()));
+		data.add(new Component("file:resources/listview.png", "ListView", 4, parent, false, new ArrayList<>(),new ArrayList<>()));
+		data.add(new Component("file:resources/hbox.png", "Hbox", 5, parent, true, new ArrayList<>(),new ArrayList<>()));
+		data.add(new Component("file:resources/vbox.png", "Vbox", 6, parent, true, new ArrayList<>(),new ArrayList<>()));
+		data.add(new Component("file:resources/webview.png", "WebView", 7, parent, false, new ArrayList<>(),new ArrayList<>()));
+		data.add(new Component("file:resources/pane.png", "Pane", 8, parent, true, new ArrayList<>(),new ArrayList<>()));
+		data.add(new Component("file:resources/gridpane.png", "GridPane", 9, parent, true, new ArrayList<>(), new ArrayList<>()));
+		data.add(new Component("file:resources/checkbox.png", "CheckBox", 10, parent,new ArrayList<>()));
+		data.add(new Component("file:resources/borderPane.png", "BorderPane", 11, parent, true, new ArrayList<>(),new ArrayList<>()));
 
 
 		//la liste des composants
 		list_components.setCellFactory(new ComponentsCell());
 		list_components.setItems(data);
+
 		list_components.getSelectionModel().selectedItemProperty().addListener(e->{
 			Component c = list_components.getSelectionModel().getSelectedItem();
 			System.out.println(c.toString());
@@ -185,6 +193,7 @@ public class Controller implements Initializable{
 		treeView.getSelectionModel().selectedItemProperty().addListener(e->{
 			desactivateAttributes(false);
 			panel.setUserData(treeView.getSelectionModel().getSelectedItem().getValue());
+			showAttributes();
 		});
 
 
@@ -207,6 +216,86 @@ public class Controller implements Initializable{
                 return new DnDCell(param);
             }
         });
+
+		//la liste des elemnet de type container
+		List<Component> lsContainers = new ArrayList<>();
+		for(Component c:data){
+			if(c.isContainer())
+				lsContainers.add(c);
+		}
+		//et on vas appliquer le drag and drap sur toutes les type container
+		appliquerDragAndDropOnContainer();
+
+	}
+
+	//show les attributs deja attribuer pour cette composant
+	private void showAttributes(){
+		Component selected = treeView.getSelectionModel().getSelectedItem().getValue();
+
+		if(!selected.getLsAttributes().isEmpty()){
+			id.setText(selected.getLsAttributes().get(0).getValue());
+			height.setText(selected.getLsAttributes().get(1).getValue());
+			width.setText(selected.getLsAttributes().get(2).getValue());
+			texte.setText(selected.getLsAttributes().get(3).getValue());
+			ck_editable.setText(selected.getLsAttributes().get(4).getValue());
+			ck_visible.setText(selected.getLsAttributes().get(5).getValue());
+			combo_color.setValue(selected.getLsAttributes().get(6).getValue());
+			bg.setText(selected.getLsAttributes().get(7).getValue());
+		}
+	}
+
+	/*
+	 *  appliquer le drag and drap sur toutes les type container
+	 */
+	private void appliquerDragAndDropOnContainer() {
+		for(Node n:panel.getChildren()){
+			if(n.equals(BorderPane.class) || n.equals(VBox.class) ||
+					n.equals(HBox.class) || n.equals(AnchorPane.class)){
+
+				n.setOnDragOver(new EventHandler <DragEvent>(){
+					public void handle(DragEvent event){
+						panelDragOver(event, n);
+					}
+				});
+				n.setOnDragDropped(new EventHandler <DragEvent>(){
+					public void handle(DragEvent event){
+						panelDragDropped(event, n);
+					}
+				});
+				n.setOnDragDone(new EventHandler <DragEvent>(){
+					public void handle(DragEvent event){
+						panelDragDone(event, n);
+					}
+				});
+			}
+		}
+
+	}
+
+	/*
+	 * method to change the main container layout selon le type choisi
+	 */
+	public void changeMainContainer() {
+		Node container = null;
+		String containerSelected = getLayout();
+		//on va selectionner le container selon le choix
+		if(containerSelected.equals("Frame"))
+			container = new AnchorPane();
+		else
+			if(containerSelected.equals("BorderLayout"))
+				container = new BorderPane();
+			else
+				if(containerSelected.equals("LinearLayout(Vertical)"))
+					container = new VBox();
+				else
+					container = new HBox();
+
+		//et on vas remplacer le container avec notre choix
+		container.prefHeight(panel.getPrefHeight());
+		container.prefWidth(panel.getPrefWidth());
+		panel.getChildren().add(container);
+
+		//panel = container;
 
 	}
 
@@ -404,6 +493,9 @@ public class Controller implements Initializable{
 		event.consume();
 	}
 
+	/*
+	 * on veut retourner le composant selectionner apartir de la liste des composants
+	 */
 	private Node getSelectedNodeType(ArrayList<Component> list, double x, double y) {
 		Component selected = list.get(0);
 
@@ -423,42 +515,51 @@ public class Controller implements Initializable{
 				break;
 			case 3:
 				Label lb = new Label(selected.getName());
-
 				node = lb;
 				break;
 			case 4:
 				ListView<String> ls = new ListView<>();
 				ls.setItems(FXCollections.observableArrayList("item1","item2","item3","item4"));
+				ls.setMaxSize(80, 80);
+				//ls.prefWidth(20);
 				node = ls;
 				break;
 			case 5:
 				HBox hb = new HBox();
-				hb.prefHeight(20);
+				hb.setMaxSize(80, 80);
+				hb.setStyle("background-color: #e3e3e3;");
 				node = hb;
 				break;
 			case 6:
-				WebView wb = new WebView();
-				wb.prefHeight(20);
-				node = wb;
+				VBox vb = new VBox();
+				vb.setMaxSize(80, 80);
+				vb.setStyle("background-color: #e3e3e3;");
+				node = vb;
 				break;
 			case 7:
-				Pane p = new Pane();
-				p.prefHeight(20);
-				node = p;
+				WebView wb = new WebView();
+				wb.setMaxSize(80, 80);
+				wb.setStyle("background-color: #e3e3e3;");
+				node = wb;
 				break;
 			case 8:
-				GridPane gp = new GridPane();
-				gp.setPrefHeight(20);
-				node = gp;
+				AnchorPane p = new AnchorPane();
+				p.setMaxSize(80, 80);
+				p.setStyle("background-color: #e3e3e3;");
+				node = p;
 				break;
 			case 9:
-				CheckBox ck = new CheckBox();
-
-				node = ck;
+				GridPane gp = new GridPane();
+				gp.setMaxSize(80, 80);
+				node = gp;
 				break;
 			case 10:
+				CheckBox ck = new CheckBox("checkbox");
+				node = ck;
+				break;
+			case 11:
 				BorderPane bp = new BorderPane();
-				bp.setPrefHeight(20);
+				bp.setMaxSize(80, 80);
 				node = bp;
 				break;
 			default:
@@ -492,9 +593,25 @@ public class Controller implements Initializable{
 
 	//les handllers : evenements pour manipuler les buttons
 	public void HandleAttribuer(){
+		//initilialiser avec les attributs deja selectionner
+		Component selected = treeView.getSelectionModel().getSelectedItem().getValue();
+		//attribuer les nouvaux attributs entres
+		ArrayList<Attribute> newAttributes = new ArrayList<>();
+
+		newAttributes.add(new Attribute("id", id.getText()));
+		newAttributes.add(new Attribute("height", height.getText()));
+		newAttributes.add(new Attribute("width", width.getText()));
+		newAttributes.add(new Attribute("texte", texte.getText()));
+		newAttributes.add(new Attribute("editable", ck_editable.getText()));
+		newAttributes.add(new Attribute("visible", ck_visible.getText()));
+		newAttributes.add(new Attribute("color", combo_color.getValue()));
+		newAttributes.add(new Attribute("bg", bg.getText()));
+
+		selected.setLsAttributes(newAttributes);
+
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setContentText("Wait ! Working progress :) ");
-		alert.setHeaderText("Wait ! Working on that !");
+		alert.setContentText("Ok ! Bien Ajouter :) ");
+		alert.setHeaderText("Les attributs sonts bien ajouter a "+selected.getName()+" !");
 		alert.showAndWait();
 	}
 	public void HandleGenerer(){
@@ -502,6 +619,11 @@ public class Controller implements Initializable{
 		alert.setContentText("Wait ! Working progress :) ");
 		alert.setHeaderText("Wait ! Working on that !");
 		alert.showAndWait();
+
+		//la liste des element choisis
+		for(TreeItem<Component> tr:treeView.getRoot().getChildren()){
+			System.out.println(tr.getValue().getName());
+		}
 	}
 	public void HandleSupprimer(){
 		if(treeView.getSelectionModel().getSelectedItem() != null){
@@ -514,10 +636,10 @@ public class Controller implements Initializable{
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.get() == ButtonType.OK){
 				TreeItem<Component> selected = treeView.getSelectionModel().getSelectedItem();
+				// working !!
+				panel.getChildren().remove(treeView.getSelectionModel().getSelectedIndex());
 				treeView.getRoot().getChildren().remove(selected);
 
-				//not working !!
-				panel.getChildren().remove(panel.getUserData());
 			} else {
 
 			}
@@ -535,7 +657,7 @@ public class Controller implements Initializable{
 	 *
 	 */
 
-	private void panelDragOver(DragEvent event, Pane p)
+	private void panelDragOver(DragEvent event, Node p)
 	{
 		// If drag board has an ITEM_LIST and it is not being dragged
 		// over itself, we accept the MOVE transfer mode
@@ -549,7 +671,7 @@ public class Controller implements Initializable{
 		event.consume();
 	}
 
-	private void panelDragDropped(DragEvent event, Pane p)
+	private void panelDragDropped(DragEvent event, Node p)
 	{
 		boolean dragCompleted = false;
 
@@ -599,7 +721,7 @@ public class Controller implements Initializable{
 		event.consume();
 	}
 
-	private void panelDragDone(DragEvent event, Pane  p){
+	private void panelDragDone(DragEvent event, Node  p){
 		// Check how data was transfered to the target
 		// If it was moved, clear the selected items
 		TransferMode tm = event.getTransferMode();
@@ -630,6 +752,16 @@ public class Controller implements Initializable{
 		ck_visible.setDisable(val);
 		combo_color.setDisable(val);
 		bg.setDisable(val);
+
+		//vider les champs
+		id.setText("");
+		height.setText("");
+		width.setText("");
+		texte.setText("");
+		ck_editable.setSelected(false);
+		ck_visible.setSelected(false);
+		combo_color.setValue("");
+		bg.setText("...");
 	}
 
 	//this methode is used to generate the component from name

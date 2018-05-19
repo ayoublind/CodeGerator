@@ -51,7 +51,7 @@ public class Main extends Application {
 		//conteneur
 		choices.add("Frame");
 		choices.add("BorderLayout");
-		choices.add("LinearLayout(Verticat)");
+		choices.add("LinearLayout(Vertical)");
 		choices.add("LinearLayout(Horizental)");
 
 
@@ -70,6 +70,10 @@ public class Main extends Application {
 		if (result.isPresent()){
 		    System.out.println("Votre Choix: " + result.get());
 		    controller.setLayout(result.get());
+		    
+		    controller.changeMainContainer();
+		    controller.initialiser();
+		    controller.infos.setText("Main Container : "+result.get());
 		}
 	}
 
