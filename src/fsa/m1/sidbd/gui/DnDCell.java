@@ -23,7 +23,7 @@ public class DnDCell extends TreeCell<Component>{
          setOnDragDetected(new EventHandler<MouseEvent>() {
              @Override
              public void handle(MouseEvent event) {
-                 System.out.println("Drag detected on " + item);
+                 //System.out.println("Drag detected on " + item);
                  if (item == null) {
                      return;
                  }
@@ -37,14 +37,14 @@ public class DnDCell extends TreeCell<Component>{
          setOnDragDone(new EventHandler<DragEvent>() {
              @Override
              public void handle(DragEvent dragEvent) {
-                 System.out.println("Drag done on " + item);
+                 //System.out.println("Drag done on " + item);
                  dragEvent.consume();
              }
          });
          setOnDragOver(new EventHandler<DragEvent>() {
              @Override
              public void handle(DragEvent dragEvent) {
-                 System.out.println("Drag over on " + item);
+                 //System.out.println("Drag over on " + item);
                  if (dragEvent.getDragboard().hasString()) {
                      Component valueToMove = parentTree.getSelectionModel().getSelectedItem().getValue();
                      if (valueToMove != item && !valueToMove.isContainer()) {
@@ -58,7 +58,7 @@ public class DnDCell extends TreeCell<Component>{
          setOnDragDropped(new EventHandler<DragEvent>() {
              @Override
              public void handle(DragEvent dragEvent) {
-                 System.out.println("Drag dropped on " + item);
+                 //System.out.println("Drag dropped on " + item);
                  Component valueToMove = parentTree.getSelectionModel().getSelectedItem().getValue();
                  TreeItem<Component> itemToMove = search(parentTree.getRoot(), valueToMove);
                  TreeItem<Component> newParent = search(parentTree.getRoot(), item);

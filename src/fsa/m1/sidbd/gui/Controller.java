@@ -15,12 +15,14 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
@@ -79,10 +81,16 @@ public class Controller implements Initializable{
 	private String layout;
 
 
+	//id fixed
+	static int _id = 0;
+
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		ObservableList<String> colors = FXCollections.observableArrayList("bleu","black","white","yellow");
 		combo_color.setItems(colors);
+
+		initialiser();
 	}
 
 	public void initialiser() {
@@ -192,7 +200,8 @@ public class Controller implements Initializable{
 
 		treeView.getSelectionModel().selectedItemProperty().addListener(e->{
 			desactivateAttributes(false);
-			panel.setUserData(treeView.getSelectionModel().getSelectedItem().getValue());
+			//panel.setUserData(treeView.getSelectionModel().getSelectedItem().getValue());
+			id.setText(treeView.getSelectionModel().getSelectedItem().getValue().getId_c());
 			showAttributes();
 		});
 
@@ -202,12 +211,7 @@ public class Controller implements Initializable{
 
 
 		//initialise the code part with example code
-		codeTxt.setText("<frame>\n"
-				+ "\t<items>\n"
-				+ "\t\t<button id=\"\btn\">button</button>\n"
-				+ "\t</items>\n"
-				+ "\n"
-				+ "</frame>");
+		codeTxt.setText(" <frame> \n");
 
 		//drag and drop over the frame(treeview) elemnt
 		treeView.setCellFactory(new Callback<TreeView<Component>, TreeCell<Component>>() {
@@ -224,7 +228,7 @@ public class Controller implements Initializable{
 				lsContainers.add(c);
 		}
 		//et on vas appliquer le drag and drap sur toutes les type container
-		appliquerDragAndDropOnContainer();
+		//appliquerDragAndDropOnContainer();
 
 	}
 
@@ -233,7 +237,7 @@ public class Controller implements Initializable{
 		Component selected = treeView.getSelectionModel().getSelectedItem().getValue();
 
 		if(!selected.getLsAttributes().isEmpty()){
-			id.setText(selected.getLsAttributes().get(0).getValue());
+			id.setText(selected.getId_c());
 			height.setText(selected.getLsAttributes().get(1).getValue());
 			width.setText(selected.getLsAttributes().get(2).getValue());
 			texte.setText(selected.getLsAttributes().get(3).getValue());
@@ -458,6 +462,10 @@ public class Controller implements Initializable{
 			double y = event.getY();
 
 			Component c = list.get(0);
+			_id++;
+			c.setId_c("id"+_id);
+
+
 			//c.setLayoutX(x);
 			//c.setLayoutY(y);
 
@@ -469,11 +477,31 @@ public class Controller implements Initializable{
 			compo.setPreserveRatio(true);
 			panel.getChildren().add(compo);*/
 
+
 			//add this componennt to the listitem
 			listItem.add(c);
 
+			//setter le id fixe
+			id.setText("id"+_id);
+
 			//adding to the tree
 			treeView.getRoot().getChildren().add(new TreeItem<>(c));
+
+			//System.out.println(c.getName());
+
+			//verification au niveau du code
+			String splitting[] = codeTxt.getText().split(" ");
+			String out = "";
+
+			for(int i=0;i<splitting.length;i++){
+				if(!splitting[i].equals("</frame>"))
+					out = out + " " + splitting[i];
+			}
+
+			codeTxt.setText(out+" \n\t <"+c.getName()+" "
+					+ " id='"+c.getId_c()+"' > "
+					+" </"+c.getName()+"> "
+					+ "\n </frame> ");
 
 			//adding context menu
 			//initContextMenu(getSelectedNodeType(list, x, y));
@@ -499,7 +527,7 @@ public class Controller implements Initializable{
 	private Node getSelectedNodeType(ArrayList<Component> list, double x, double y) {
 		Component selected = list.get(0);
 
-		Node node = null;
+		Node node = new AnchorPane();
 
 		switch (selected.getType()) {
 			case 0:
@@ -602,12 +630,26 @@ public class Controller implements Initializable{
 		newAttributes.add(new Attribute("height", height.getText()));
 		newAttributes.add(new Attribute("width", width.getText()));
 		newAttributes.add(new Attribute("texte", texte.getText()));
-		newAttributes.add(new Attribute("editable", ck_editable.getText()));
-		newAttributes.add(new Attribute("visible", ck_visible.getText()));
+
+		String editable = "false";
+		if(ck_editable.isSelected())
+			editable = "true";
+		newAttributes.add(new Attribute("editable", editable));
+
+		String visible = "false";
+		if(ck_visible.isSelected())
+			visible = "true";
+		newAttributes.add(new Attribute("visible", visible));
+
 		newAttributes.add(new Attribute("color", combo_color.getValue()));
 		newAttributes.add(new Attribute("bg", bg.getText()));
 
 		selected.setLsAttributes(newAttributes);
+
+		//changes selon les attributs
+
+		//adding attributs to xml code
+		addAttributsToXmlTag(id.getText(), selected);
 
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setContentText("Ok ! Bien Ajouter :) ");
@@ -624,6 +666,9 @@ public class Controller implements Initializable{
 		for(TreeItem<Component> tr:treeView.getRoot().getChildren()){
 			System.out.println(tr.getValue().getName());
 		}
+
+		//fermer la frame
+		codeTxt.appendText("</frame>");
 	}
 	public void HandleSupprimer(){
 		if(treeView.getSelectionModel().getSelectedItem() != null){
@@ -689,6 +734,27 @@ public class Controller implements Initializable{
 			//c.setLayoutX(x);
 			//c.setLayoutY(y);
 
+			_id++;
+			c.setId_c("id"+_id);
+
+			//verification au niveau du code
+			String splitting[] = codeTxt.getText().split(" ");
+			String out = "";
+
+			for(int i=0;i<splitting.length;i++){
+				if(!splitting[i].equals("</frame>"))
+					out = out + " " + splitting[i];
+			}
+
+			codeTxt.setText(out+" \n\t <"+c.getName()+" "
+					+ " id='"+c.getId_c()+"' > "
+					+" </"+c.getName()+"> "
+					+"\n </frame> ");
+
+
+			//setter le id fixe
+			id.setText("id"+_id);
+
 			panel.getChildren().add(getSelectedNodeType(list, x, y));
 
 			/*ImageView compo = new ImageView(c.getImageUrl());
@@ -703,6 +769,9 @@ public class Controller implements Initializable{
 			//adding to the tree
 			treeView.getRoot().getChildren().add(new TreeItem<>(c));
 
+			//String attributs_txt = "";
+			//for(Attribute atr:c.getLsAttributes())
+				//attributs_txt = attributs_txt+" "+atr.getName()+"='"+atr.getValue()+"' ";
 
 			//adding context menu
 			//initContextMenu(getSelectedNodeType(list, x, y));
@@ -744,7 +813,7 @@ public class Controller implements Initializable{
 
 	//methode to disactivate the attributes items
 	public void desactivateAttributes(boolean val){
-		id.setDisable(val);
+		//id.setDisable(val);
 		height.setDisable(val);
 		width.setDisable(val);
 		texte.setDisable(val);
@@ -754,7 +823,7 @@ public class Controller implements Initializable{
 		bg.setDisable(val);
 
 		//vider les champs
-		id.setText("");
+		//id.setText("");
 		height.setText("");
 		width.setText("");
 		texte.setText("");
@@ -775,7 +844,58 @@ public class Controller implements Initializable{
 	}
 
 
+	//ajouter la liste des attributs a un elemnt xml
+	private void addAttributsToXmlTag(String id, Component c){
 
+		String after = "";
+		String before = "";
+
+		String t[] = codeTxt.getText().split(" ");
+
+		//test
+		for(int k=0;k<t.length;k++)
+			System.out.println(t[k]+" - ");
+
+		for(int i=0;i<t.length;i++){
+			if(t[i].equals("id='"+id+"'")){
+				for(int j=i+1;j<t.length;j++)
+					after = after +" "+ t[j];
+				break;
+			}else{
+				before = before + " "+ t[i];
+			}
+		}
+
+		String attributs_txt = "";
+		for(Attribute atr:c.getLsAttributes()){
+			if(!atr.getValue().equals("")) //s'il est vide pas la peine de l'ajouter
+				attributs_txt = attributs_txt+" "+atr.getName()+"='"+atr.getValue()+"' ";
+		}
+
+
+		System.out.println("Before :"+before);
+		System.out.println("ch :"+attributs_txt);
+		System.out.println("after : "+after);
+
+		//set the code approprie
+		codeTxt.setText(before+attributs_txt+after);
+
+		//close parents
+		closeParentBalise();
+	}
+
+	//fermer la balise parente
+	private void closeParentBalise(){
+		String t[] = codeTxt.getText().split(" ");
+		String allTheCode = "";
+
+		for(int i=0;i<t.length-2;i++){
+			allTheCode = allTheCode + " "+ t[i];
+		}
+		allTheCode = allTheCode + "\n </frame> ";
+
+		codeTxt.setText(allTheCode);
+	}
 
 	//getters and setters
 	public void setLayout(String layout) {

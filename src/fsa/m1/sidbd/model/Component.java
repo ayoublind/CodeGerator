@@ -8,6 +8,7 @@ public class Component implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 
+	private String id_c;
 	private String imageUrl;
 	private String name;
 	private int type;
@@ -18,7 +19,7 @@ public class Component implements Serializable{
 	private List<Attribute> lsAttributes;
 
 	//constructeur
-	public Component(String imageUrl, String name, int t, Component parent, ArrayList<Attribute> ls) {
+	public Component( String imageUrl, String name, int t, Component parent, ArrayList<Attribute> ls) {
 		super();
 		this.imageUrl = imageUrl;
 		this.name = name;
@@ -28,7 +29,7 @@ public class Component implements Serializable{
 	}
 
 	//constructeur
-	public Component(String imageUrl, String name, int t, Component parent, boolean iscontainer,
+	public Component( String imageUrl, String name, int t, Component parent, boolean iscontainer,
 			ArrayList<Component> childrens, ArrayList<Attribute> ls) {
 		super();
 		this.imageUrl = imageUrl;
@@ -102,5 +103,12 @@ public class Component implements Serializable{
 
 	public void setChildrens(List<Component> childrens) {
 		this.childrens = childrens;
+	}
+
+	public String getId_c() {
+		return id_c;
+	}
+	public void setId_c(String id_c) {
+		this.id_c = id_c;
 	}
 }

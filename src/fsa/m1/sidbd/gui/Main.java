@@ -31,6 +31,7 @@ public class Main extends Application {
 	        		controller.desactivateAttributes(true);
 	        	});
 	        }
+	        
 
 	        primaryStage.getIcons().add(new Image("file:resources/logo.png"));
 
@@ -70,9 +71,8 @@ public class Main extends Application {
 		if (result.isPresent()){
 		    System.out.println("Votre Choix: " + result.get());
 		    controller.setLayout(result.get());
-		    
+
 		    controller.changeMainContainer();
-		    controller.initialiser();
 		    controller.infos.setText("Main Container : "+result.get());
 		}
 	}
