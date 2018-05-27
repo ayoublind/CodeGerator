@@ -85,12 +85,14 @@ public class Controller implements Initializable{
 	static int _id = 0;
 
 
+	//list of text lines
+	List<String> lignes = new ArrayList<>();
+
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		ObservableList<String> colors = FXCollections.observableArrayList("bleu","black","white","yellow");
 		combo_color.setItems(colors);
-
-		initialiser();
 	}
 
 	public void initialiser() {
@@ -211,7 +213,16 @@ public class Controller implements Initializable{
 
 
 		//initialise the code part with example code
-		codeTxt.setText(" <frame> \n");
+		lignes.add("<frame LayoutType='"+getLayout()+"' width='full' height='full'>");
+		lignes.add("</frame>");
+
+		//on va modifier le textarea par ces valeurs
+		codeTxt.setText("");
+		codeTxt.setText(lignes.get(0)+"\n");
+		for(int i=1;i<lignes.size()-1;i++)
+			codeTxt.appendText("\t"+lignes.get(i)+"\n");
+
+		codeTxt.appendText(lignes.get(lignes.size()-1));
 
 		//drag and drop over the frame(treeview) elemnt
 		treeView.setCellFactory(new Callback<TreeView<Component>, TreeCell<Component>>() {
@@ -489,7 +500,64 @@ public class Controller implements Initializable{
 
 			//System.out.println(c.getName());
 
-			//verification au niveau du code
+			//balise existe or no
+			boolean isExist = false;
+			for(String s:lignes){
+				if(s.contains(c.getName()))
+					isExist = true;
+			}
+
+			if(isExist){
+				//hasAttribute
+				boolean hasAttributes = false;
+				for(String s:lignes){
+					if(s.contains("id='"+c.getId_c()+"'") && s.contains("width=''"))
+						hasAttributes = true;
+				}
+				//recupire la ligne a modifier
+				String courant = lignes.get(lignes.size()-1);
+				int index = lignes.size()-1;
+				for(String s:lignes)
+					if(s.contains("id='"+c.getId_c()+"'")){
+						courant = s;
+						index = lignes.indexOf(courant);
+					}
+
+				//if(hasAttributes){
+					//recupirer le nom de la balise
+					String baliseName = courant.split(" ")[0];
+					//les attributs
+					String attributs = "";
+					for(Attribute atr:c.getLsAttributes())
+						attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
+
+					//modifier le courant
+					lignes.set(index, baliseName+" id='"+c.getId_c()+"' "+attributs+"> </"+baliseName.substring(1));
+
+					//fermer la balise
+					lignes.add("</frame>");
+			}else{
+				//les attributs
+				String attributs = "";
+				for(Attribute atr:c.getLsAttributes())
+					attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
+
+				//modifier le courant
+				lignes.set(lignes.size()-1, "<"+c.getName()+" id='"+c.getId_c()+"' "+attributs+"> </"+c.getName().substring(1));
+
+				//fermer la balise
+				lignes.add("</frame>");
+			}
+
+			//update the code part
+			codeTxt.setText("");
+			codeTxt.setText(lignes.get(0));
+			for(int i=1;i<lignes.size()-1;i++)
+				codeTxt.appendText("\n\t"+lignes.get(i));
+
+			codeTxt.appendText("\n"+lignes.get(lignes.size()-1));
+
+			/*/verification au niveau du code
 			String splitting[] = codeTxt.getText().split(" ");
 			String out = "";
 
@@ -501,7 +569,7 @@ public class Controller implements Initializable{
 			codeTxt.setText(out+" \n\t <"+c.getName()+" "
 					+ " id='"+c.getId_c()+"' > "
 					+" </"+c.getName()+"> "
-					+ "\n </frame> ");
+					+ "\n </frame> ");*/
 
 			//adding context menu
 			//initContextMenu(getSelectedNodeType(list, x, y));
@@ -737,7 +805,63 @@ public class Controller implements Initializable{
 			_id++;
 			c.setId_c("id"+_id);
 
-			//verification au niveau du code
+
+			boolean isExist = false;
+			for(String s:lignes){
+				if(s.contains(c.getName()))
+					isExist = true;
+			}
+
+			if(isExist){
+				//hasAttribute
+				boolean hasAttributes = false;
+				for(String s:lignes){
+					if(s.contains("id='"+c.getId_c()+"'") && s.contains("width=''"))
+						hasAttributes = true;
+				}
+				//recupire la ligne a modifier
+				String courant = lignes.get(lignes.size()-1);
+				int index = lignes.size()-1;
+				for(String s:lignes)
+					if(s.contains("id='"+c.getId_c()+"'")){
+						courant = s;
+						index = lignes.indexOf(courant);
+					}
+
+				//if(hasAttributes){
+					//recupirer le nom de la balise
+					String baliseName = courant.split(" ")[0];
+					//les attributs
+					String attributs = "";
+					for(Attribute atr:c.getLsAttributes())
+						attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
+
+					//modifier le courant
+					lignes.set(index, baliseName+" id='"+c.getId_c()+"' "+attributs+"> </"+baliseName.substring(1));
+
+					//fermer la balise
+					lignes.add("</frame>");
+			}else{
+				//les attributs
+				String attributs = "";
+				for(Attribute atr:c.getLsAttributes())
+					attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
+
+				//modifier le courant
+				lignes.set(lignes.size()-1, "<"+c.getName()+" id='"+c.getId_c()+"' "+attributs+"> </"+c.getName()+">");
+
+				//fermer la balise
+				lignes.add("</frame>");
+			}
+			//update the code text part
+			codeTxt.setText("");
+			codeTxt.setText(lignes.get(0));
+			for(int i=1;i<lignes.size()-1;i++)
+				codeTxt.appendText("\n\t"+lignes.get(i));
+
+			codeTxt.appendText("\n"+lignes.get(lignes.size()-1));
+
+			/*/verification au niveau du code
 			String splitting[] = codeTxt.getText().split(" ");
 			String out = "";
 
@@ -749,7 +873,7 @@ public class Controller implements Initializable{
 			codeTxt.setText(out+" \n\t <"+c.getName()+" "
 					+ " id='"+c.getId_c()+"' > "
 					+" </"+c.getName()+"> "
-					+"\n </frame> ");
+					+"\n </frame> ");*/
 
 
 			//setter le id fixe
@@ -847,7 +971,25 @@ public class Controller implements Initializable{
 	//ajouter la liste des attributs a un elemnt xml
 	private void addAttributsToXmlTag(String id, Component c){
 
-		String after = "";
+		int index = 0;
+		for(String s:lignes){
+			if(s.contains(id) && s.contains(c.getName()))
+				index = lignes.indexOf(s);
+		}
+		String attributs = "";
+		for(Attribute atr:c.getLsAttributes())
+			attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
+
+		lignes.set(index, "<"+c.getName()+" "+attributs+"> </"+c.getName()+">");
+
+		//update the code text part
+		codeTxt.setText("");
+		codeTxt.setText(lignes.get(0)+"\n");
+		for(int i=1;i<lignes.size()-1;i++)
+			codeTxt.appendText("\t"+lignes.get(i)+"\n");
+
+		codeTxt.appendText(lignes.get(lignes.size()-1));
+		/*String after = "";
 		String before = "";
 
 		String t[] = codeTxt.getText().split(" ");
@@ -881,7 +1023,7 @@ public class Controller implements Initializable{
 		codeTxt.setText(before+attributs_txt+after);
 
 		//close parents
-		closeParentBalise();
+		closeParentBalise();*/
 	}
 
 	//fermer la balise parente

@@ -31,7 +31,7 @@ public class Main extends Application {
 	        		controller.desactivateAttributes(true);
 	        	});
 	        }
-	        
+
 
 	        primaryStage.getIcons().add(new Image("file:resources/logo.png"));
 
@@ -73,8 +73,9 @@ public class Main extends Application {
 		    controller.setLayout(result.get());
 
 		    controller.changeMainContainer();
-		    controller.infos.setText("Main Container : "+result.get());
+		    controller.infos.setText(result.get());
 		}
+		controller.initialiser();
 	}
 
 	public static void main(String[] args) {
