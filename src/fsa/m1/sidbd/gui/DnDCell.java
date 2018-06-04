@@ -62,14 +62,14 @@ public class DnDCell extends TreeCell<Component>{
                  Component valueToMove = parentTree.getSelectionModel().getSelectedItem().getValue();
                  TreeItem<Component> itemToMove = search(parentTree.getRoot(), valueToMove);
                  TreeItem<Component> newParent = search(parentTree.getRoot(), item);
-                 //if(itemToMove.getValue().isContainer()){
+                 if(newParent.getValue().isContainer()){
 	                 // Remove from former parent.
 	                 itemToMove.getParent().getChildren().remove(itemToMove);
 	                 // Add to new parent.
 	                 newParent.getChildren().add(itemToMove);
 	                 newParent.setExpanded(true);
 	                 dragEvent.consume();
-                // }
+                 }
              }
          });
      }

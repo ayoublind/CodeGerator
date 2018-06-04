@@ -498,6 +498,7 @@ public class Controller implements Initializable{
 			//adding to the tree
 			treeView.getRoot().getChildren().add(new TreeItem<>(c));
 
+
 			//System.out.println(c.getName());
 
 			//balise existe or no
