@@ -15,14 +15,12 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
@@ -213,13 +211,15 @@ public class Controller implements Initializable{
 
 
 		//initialise the code part with example code
+		lignes.add("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		lignes.add("<frame LayoutType='"+getLayout()+"' width='full' height='full'>");
 		lignes.add("</frame>");
 
 		//on va modifier le textarea par ces valeurs
 		codeTxt.setText("");
 		codeTxt.setText(lignes.get(0)+"\n");
-		for(int i=1;i<lignes.size()-1;i++)
+		codeTxt.appendText(lignes.get(1)+"\n");
+		for(int i=2;i<lignes.size()-1;i++)
 			codeTxt.appendText("\t"+lignes.get(i)+"\n");
 
 		codeTxt.appendText(lignes.get(lignes.size()-1));
@@ -228,7 +228,7 @@ public class Controller implements Initializable{
 		treeView.setCellFactory(new Callback<TreeView<Component>, TreeCell<Component>>() {
             @Override
             public TreeCell call(TreeView<Component> param) {
-                return new DnDCell(param);
+                return new DnDCell(Controller.this,param);
             }
         });
 
@@ -247,8 +247,10 @@ public class Controller implements Initializable{
 	private void showAttributes(){
 		Component selected = treeView.getSelectionModel().getSelectedItem().getValue();
 
-		if(!selected.getLsAttributes().isEmpty()){
-			id.setText(selected.getId_c());
+		id.setText(selected.getId_c());
+
+		if(selected.getLsAttributes().size() > 1){
+
 			height.setText(selected.getLsAttributes().get(1).getValue());
 			width.setText(selected.getLsAttributes().get(2).getValue());
 			texte.setText(selected.getLsAttributes().get(3).getValue());
@@ -257,34 +259,6 @@ public class Controller implements Initializable{
 			combo_color.setValue(selected.getLsAttributes().get(6).getValue());
 			bg.setText(selected.getLsAttributes().get(7).getValue());
 		}
-	}
-
-	/*
-	 *  appliquer le drag and drap sur toutes les type container
-	 */
-	private void appliquerDragAndDropOnContainer() {
-		for(Node n:panel.getChildren()){
-			if(n.equals(BorderPane.class) || n.equals(VBox.class) ||
-					n.equals(HBox.class) || n.equals(AnchorPane.class)){
-
-				n.setOnDragOver(new EventHandler <DragEvent>(){
-					public void handle(DragEvent event){
-						panelDragOver(event, n);
-					}
-				});
-				n.setOnDragDropped(new EventHandler <DragEvent>(){
-					public void handle(DragEvent event){
-						panelDragDropped(event, n);
-					}
-				});
-				n.setOnDragDone(new EventHandler <DragEvent>(){
-					public void handle(DragEvent event){
-						panelDragDone(event, n);
-					}
-				});
-			}
-		}
-
 	}
 
 	/*
@@ -475,7 +449,7 @@ public class Controller implements Initializable{
 			Component c = list.get(0);
 			_id++;
 			c.setId_c("id"+_id);
-
+			c.getLsAttributes().add(new Attribute("id", "id"+_id));
 
 			//c.setLayoutX(x);
 			//c.setLayoutY(y);
@@ -533,7 +507,7 @@ public class Controller implements Initializable{
 						attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
 
 					//modifier le courant
-					lignes.set(index, baliseName+" id='"+c.getId_c()+"' "+attributs+"> </"+baliseName.substring(1));
+					lignes.set(index, baliseName+" "+attributs+"> </"+baliseName.substring(1));
 
 					//fermer la balise
 					lignes.add("</frame>");
@@ -544,7 +518,7 @@ public class Controller implements Initializable{
 					attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
 
 				//modifier le courant
-				lignes.set(lignes.size()-1, "<"+c.getName()+" id='"+c.getId_c()+"' "+attributs+"> </"+c.getName().substring(1));
+				lignes.set(lignes.size()-1, "<"+c.getName()+" "+attributs+"> </"+c.getName().substring(1));
 
 				//fermer la balise
 				lignes.add("</frame>");
@@ -552,8 +526,10 @@ public class Controller implements Initializable{
 
 			//update the code part
 			codeTxt.setText("");
-			codeTxt.setText(lignes.get(0));
-			for(int i=1;i<lignes.size()-1;i++)
+			codeTxt.setText(lignes.get(0)+"\n");
+			codeTxt.appendText(lignes.get(1));
+
+			for(int i=2;i<lignes.size()-1;i++)
 				codeTxt.appendText("\n\t"+lignes.get(i));
 
 			codeTxt.appendText("\n"+lignes.get(lignes.size()-1));
@@ -693,27 +669,28 @@ public class Controller implements Initializable{
 		//initilialiser avec les attributs deja selectionner
 		Component selected = treeView.getSelectionModel().getSelectedItem().getValue();
 		//attribuer les nouvaux attributs entres
-		ArrayList<Attribute> newAttributes = new ArrayList<>();
+		//ArrayList<Attribute> newAttributes = new ArrayList<>();
 
-		newAttributes.add(new Attribute("id", id.getText()));
-		newAttributes.add(new Attribute("height", height.getText()));
-		newAttributes.add(new Attribute("width", width.getText()));
-		newAttributes.add(new Attribute("texte", texte.getText()));
+		if(selected.getLsAttributes().size() == 1){
+			selected.getLsAttributes().add(new Attribute("height", height.getText()));
+			selected.getLsAttributes().add(new Attribute("width", width.getText()));
+			selected.getLsAttributes().add(new Attribute("texte", texte.getText()));
 
-		String editable = "false";
-		if(ck_editable.isSelected())
-			editable = "true";
-		newAttributes.add(new Attribute("editable", editable));
+			String editable = "false";
+			if(ck_editable.isSelected())
+				editable = "true";
+			selected.getLsAttributes().add(new Attribute("editable", editable));
 
-		String visible = "false";
-		if(ck_visible.isSelected())
-			visible = "true";
-		newAttributes.add(new Attribute("visible", visible));
+			String visible = "false";
+			if(ck_visible.isSelected())
+				visible = "true";
+			selected.getLsAttributes().add(new Attribute("visible", visible));
 
-		newAttributes.add(new Attribute("color", combo_color.getValue()));
-		newAttributes.add(new Attribute("bg", bg.getText()));
+			selected.getLsAttributes().add(new Attribute("color", combo_color.getValue()));
+			selected.getLsAttributes().add(new Attribute("bg", bg.getText()));
+		}
 
-		selected.setLsAttributes(newAttributes);
+		//selected.setLsAttributes(newAttributes);
 
 		//changes selon les attributs
 
@@ -726,18 +703,13 @@ public class Controller implements Initializable{
 		alert.showAndWait();
 	}
 	public void HandleGenerer(){
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setContentText("Wait ! Working progress :) ");
-		alert.setHeaderText("Wait ! Working on that !");
-		alert.showAndWait();
-
 		//la liste des element choisis
 		for(TreeItem<Component> tr:treeView.getRoot().getChildren()){
 			System.out.println(tr.getValue().getName());
 		}
 
 		//fermer la frame
-		codeTxt.appendText("</frame>");
+		//codeTxt.appendText("</frame>");
 	}
 	public void HandleSupprimer(){
 		if(treeView.getSelectionModel().getSelectedItem() != null){
@@ -751,8 +723,32 @@ public class Controller implements Initializable{
 			if (result.get() == ButtonType.OK){
 				TreeItem<Component> selected = treeView.getSelectionModel().getSelectedItem();
 				// working !!
-				panel.getChildren().remove(treeView.getSelectionModel().getSelectedIndex());
-				treeView.getRoot().getChildren().remove(selected);
+				if(selected.getValue().isContainer()){
+
+					for(TreeItem<Component> tc:selected.getChildren()){
+						treeView.getRoot().getChildren().remove(tc);
+						for(String e:lignes){
+							if(e.contains(tc.getValue().getId_c()))
+								lignes.remove(e);
+						}
+						updateText();
+					}
+					treeView.getRoot().getChildren().remove(selected);
+					for(String e:lignes)
+						if(e.contains(selected.getValue().getId_c()))
+							lignes.remove(e);
+
+					updateText();
+				}else{
+					panel.getChildren().remove(treeView.getSelectionModel().getSelectedIndex());
+					treeView.getRoot().getChildren().remove(selected);
+
+					for(String e:lignes){
+						if(e.contains(selected.getValue().getId_c()))
+							lignes.remove(e);
+					}
+					updateText();
+				}
 
 			} else {
 
@@ -805,6 +801,7 @@ public class Controller implements Initializable{
 
 			_id++;
 			c.setId_c("id"+_id);
+			c.getLsAttributes().add(new Attribute("id", "id"+_id));
 
 
 			boolean isExist = false;
@@ -838,7 +835,7 @@ public class Controller implements Initializable{
 						attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
 
 					//modifier le courant
-					lignes.set(index, baliseName+" id='"+c.getId_c()+"' "+attributs+"> </"+baliseName.substring(1));
+					lignes.set(index, baliseName+" "+attributs+"> </"+baliseName.substring(1)+">");
 
 					//fermer la balise
 					lignes.add("</frame>");
@@ -849,15 +846,17 @@ public class Controller implements Initializable{
 					attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
 
 				//modifier le courant
-				lignes.set(lignes.size()-1, "<"+c.getName()+" id='"+c.getId_c()+"' "+attributs+"> </"+c.getName()+">");
+				lignes.set(lignes.size()-1, "<"+c.getName()+" "+attributs+"> </"+c.getName()+">");
 
 				//fermer la balise
 				lignes.add("</frame>");
 			}
 			//update the code text part
 			codeTxt.setText("");
-			codeTxt.setText(lignes.get(0));
-			for(int i=1;i<lignes.size()-1;i++)
+			codeTxt.setText(lignes.get(0)+"\n");
+			codeTxt.appendText(lignes.get(1));
+
+			for(int i=2;i<lignes.size()-1;i++)
 				codeTxt.appendText("\n\t"+lignes.get(i));
 
 			codeTxt.appendText("\n"+lignes.get(lignes.size()-1));
@@ -974,7 +973,7 @@ public class Controller implements Initializable{
 
 		int index = 0;
 		for(String s:lignes){
-			if(s.contains(id) && s.contains(c.getName()))
+			if(s.contains("id='"+id+"'"))
 				index = lignes.indexOf(s);
 		}
 		String attributs = "";
@@ -986,45 +985,23 @@ public class Controller implements Initializable{
 		//update the code text part
 		codeTxt.setText("");
 		codeTxt.setText(lignes.get(0)+"\n");
-		for(int i=1;i<lignes.size()-1;i++)
+		codeTxt.appendText(lignes.get(1)+"\n");
+
+		for(int i=2;i<lignes.size()-1;i++)
 			codeTxt.appendText("\t"+lignes.get(i)+"\n");
 
 		codeTxt.appendText(lignes.get(lignes.size()-1));
-		/*String after = "";
-		String before = "";
+	}
 
-		String t[] = codeTxt.getText().split(" ");
+	//update text from string exp
+	public void updateText(){
+		codeTxt.setText("");
+		codeTxt.setText(lignes.get(0)+"\n");
+		codeTxt.appendText(lignes.get(1)+"\n");
+		for(int i=2;i<lignes.size()-1;i++)
+			codeTxt.appendText("\t"+lignes.get(i)+"\n");
 
-		//test
-		for(int k=0;k<t.length;k++)
-			System.out.println(t[k]+" - ");
-
-		for(int i=0;i<t.length;i++){
-			if(t[i].equals("id='"+id+"'")){
-				for(int j=i+1;j<t.length;j++)
-					after = after +" "+ t[j];
-				break;
-			}else{
-				before = before + " "+ t[i];
-			}
-		}
-
-		String attributs_txt = "";
-		for(Attribute atr:c.getLsAttributes()){
-			if(!atr.getValue().equals("")) //s'il est vide pas la peine de l'ajouter
-				attributs_txt = attributs_txt+" "+atr.getName()+"='"+atr.getValue()+"' ";
-		}
-
-
-		System.out.println("Before :"+before);
-		System.out.println("ch :"+attributs_txt);
-		System.out.println("after : "+after);
-
-		//set the code approprie
-		codeTxt.setText(before+attributs_txt+after);
-
-		//close parents
-		closeParentBalise();*/
+		codeTxt.appendText(lignes.get(lignes.size()-1));
 	}
 
 	//fermer la balise parente
@@ -1046,5 +1023,11 @@ public class Controller implements Initializable{
 	}
 	public String getLayout() {
 		return layout;
+	}
+	public List<String> getLignes() {
+		return lignes;
+	}
+	public void setLignes(List<String> lignes) {
+		this.lignes = lignes;
 	}
 }
