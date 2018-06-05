@@ -38,4 +38,4 @@ simplifying user interface UI manipulation and the generation of equivalent code
 ```
 
 # Main Screenshot - Apps using JavaFX (FXML)
-<p align="center"><img src="screenshot.png" width="350" /></p>
+<img src="screenshot.png" />
