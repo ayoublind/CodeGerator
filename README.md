@@ -38,4 +38,4 @@ simplifying user interface UI manipulation and the generation of equivalent code
 ```
 
 # Main Screenshot - Apps using JavaFX (FXML)
-<img src="screenshot.png" />
+![Main apps - generator](https://raw.githubusercontent.com/ayoublind/CodeGerator/blob/initial/screenshot.png)
