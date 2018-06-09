@@ -1,8 +1,12 @@
 package fsa.m1.sidbd.gui;
 
+import java.io.FileOutputStream;
 import java.util.List;
 
-import fsa.m1.sidbd.model.Attribute;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+
 import fsa.m1.sidbd.model.Component;
 import javafx.event.EventHandler;
 import javafx.scene.control.TreeCell;
@@ -54,7 +58,7 @@ public class DnDCell extends TreeCell<Component>{
                  //System.out.println("Drag over on " + item);
                  if (dragEvent.getDragboard().hasString()) {
                      Component valueToMove = parentTree.getSelectionModel().getSelectedItem().getValue();
-                     if (valueToMove != item && !valueToMove.isContainer()) {
+                     if (valueToMove != item) {
                          // We accept the transfert !!!!!
                          dragEvent.acceptTransferModes(TransferMode.MOVE);
                      }
@@ -65,7 +69,6 @@ public class DnDCell extends TreeCell<Component>{
          setOnDragDropped(new EventHandler<DragEvent>() {
              @Override
              public void handle(DragEvent dragEvent) {
-                 //System.out.println("Drag dropped on " + item);
                  Component valueToMove = parentTree.getSelectionModel().getSelectedItem().getValue();
                  TreeItem<Component> itemToMove = search(parentTree.getRoot(), valueToMove);
                  TreeItem<Component> newParent = search(parentTree.getRoot(), item);
@@ -78,84 +81,56 @@ public class DnDCell extends TreeCell<Component>{
 	                 dragEvent.consume();
 
 	                 //add it to text
-
 	                 newParent.getValue().getChildrens().add(valueToMove);
-	                 //fils
-	                 String idParent = "id='"+newParent.getValue().getId_c()+"'";
-	                 //String idFils = "id='"+itemToMove.getValue().getId_c()+"'";
 
-	                 int index = 0;
-
-
-
-	                 List<String> code = controller.lignes;
-
-	                 int i = 0;
-	                 /*String filsTag = "";
-	                 for (String e:code){
-	                	 if(e.contains(idFils)){
-	                		 System.out.println("\n fils - "+e);
-	                		 filsTag = e;
-	                		 //detete that from lignes
-	                		 i = code.indexOf(e);
-
-	                	 }
-	                 }*/
-	                 code.remove(i);
-
-	                 String newParentTag = "";
-
-	                 //adding the fils tag to parrent
-	                 for(String a:code){
-	                	 if (a.contains(idParent)){
-	                		 System.out.println("\n parent - "+a);
-
-	                		 String baliseName = a.split(" ")[0];
-	     					 //les attributs
-	     					 String attributs = "";
-	     					 for(Attribute atr:newParent.getValue().getLsAttributes())
-	     						 attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
-
-	     					 newParentTag = newParentTag + baliseName+" "+attributs+"> ";
-	     					 String childs = "";
-
-	     					 for(Component c:newParent.getValue().getChildrens()){
-	     						 String attrs = "";
-	     						 for(Attribute atr:c.getLsAttributes())
-		     						 attrs = attrs + " " +atr.getName()+"='"+atr.getValue()+"'";
-
-	     						 childs = childs+"\n\t\t<"+c.getName()+" "+attrs+"> </"+c.getName()+">";
-	     					 }
-
-	     					 newParentTag = newParentTag + "\t\t"+childs+"\n\t</"+baliseName.substring(1)+">";
-
-	                		 /*String tb[] = a.split(" ");
-	                		 String re = tb[0];
-
-	                		 String re2 = tb[1];
-
-	                		 System.out.println("re : "+re + " " +re2 +">");
-	                		 System.out.println(filsTag);
-	                		 System.out.println("</"+re.substring(1)+">");
-
-	     					 String oldChilds = "";
-
-
-
-
-
-	                		 newParentTag = baliseName + " " +idParent+">\n"
-	                		 		+ "\t\t" + filsTag + "\n"
-	                		 				+ "\t</"+baliseName.substring(1)+">";*/
-	     					 index = code.indexOf(a);
-	                		 code.set(index, newParentTag);
-	                	 }
-	                 }
-
-	                 controller.setLignes(code);
-	                 controller.updateText();
+	                 //edit xml file
+	                 updateXmlFile(newParent.getValue(), itemToMove.getValue());
                  }
              }
+
+			private void updateXmlFile(Component parent, Component child) {
+				try{
+			        //Get the JDOM document
+			        org.jdom2.Document doc = Controller.useSAXParser("output.xml");
+
+			        //Get list of component element
+			        Element rootElement = doc.getRootElement();
+			        List<Element> components = rootElement.getChildren();
+			 
+			        Element childElt = null;
+			        for (Element cp : components) {
+			        	String id = cp.getAttributeValue("id");
+
+			            if (id.equals(child.getId_c())){
+			            	System.out.println("child : "+id);
+
+			            	childElt = cp;
+			            	//supprimer le courant
+			            	rootElement.getChildren().remove(cp);
+			            }
+			        }
+			        //loop through to edit every Component element
+			        for (Element cp : components) {
+			        	String id = cp.getAttributeValue("id");
+
+			            if (id.equals(parent.getId_c())){
+			            	System.out.println("parent : "+id);
+
+			            	cp.addContent(childElt);
+			            }
+			        }
+
+			        //document is processed and edited successfully, lets save it in new file
+			        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+			        xmlOutputter.output(doc, new FileOutputStream("output.xml"));
+
+			        //refresh
+			        controller.refreshCodeFromXml();
+		    	}catch(Exception e){
+		    		e.printStackTrace();
+		    	}
+
+			}
          });
      }
 

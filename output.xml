@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<frame LayoutType="Frame" width="full" height="full">
+  <button id="id1">button</button>
+  <TextField id="id2">TextField</TextField>
+</frame>

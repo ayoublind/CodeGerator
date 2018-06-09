@@ -1,5 +1,6 @@
 package fsa.m1.sidbd.gui;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -39,9 +41,25 @@ public class Main extends Application {
 	        primaryStage.setOnShowing(e->{
 	        	showLayoutChoiceBox(controller);
 	        });
+
+	        //btn image choiser
+
+			controller.bg.setOnAction(e -> {
+				FileChooser fileChooser = new FileChooser();
+
+				FileChooser.ExtensionFilter extent=new FileChooser.ExtensionFilter("Image (.png,.jpg)","*.png","*.jpg");
+				fileChooser.getExtensionFilters().add(extent);
+
+				fileChooser.setTitle("Save Project");
+				File file = fileChooser.showOpenDialog(primaryStage);
+
+
+				if (file != null) {
+					controller.bg.setText(file.getAbsolutePath());
+					System.out.println(file);
+				}
+			});
 	        primaryStage.show();
-
-
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

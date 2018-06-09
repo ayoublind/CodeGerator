@@ -1,14 +1,41 @@
 package fsa.m1.sidbd.gui;
 
+import java.awt.Desktop;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.DOMBuilder;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.xml.sax.SAXException;
+
 import fsa.m1.sidbd.model.Attribute;
 import fsa.m1.sidbd.model.Component;
 import fsa.m1.sidbd.gui.DnDCell;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -30,6 +57,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
@@ -45,6 +73,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
 public class Controller implements Initializable{
@@ -63,7 +92,7 @@ public class Controller implements Initializable{
 	//attribute items
 	@FXML private TextField id, texte,width, height;
 	@FXML private CheckBox ck_editable, ck_visible;
-	@FXML private Button bg;
+	@FXML Button bg;
 	@FXML private ComboBox<String> combo_color;
 
 	// Set the Custom Data Format
@@ -82,9 +111,7 @@ public class Controller implements Initializable{
 	//id fixed
 	static int _id = 0;
 
-
-	//list of text lines
-	List<String> lignes = new ArrayList<>();
+	Document doc = new Document();
 
 
 	@Override
@@ -94,153 +121,179 @@ public class Controller implements Initializable{
 	}
 
 	public void initialiser() {
+		try{
+			//changer le type du maincontainer selon le type choisi par l'utilisateur
+			//changeMainContainer();
 
-		//changer le type du maincontainer selon le type choisi par l'utilisateur
-		//changeMainContainer();
+			//data for the composants
+			Component parent = new Component("file:resources/fenetre.png", "Fenetre", 0, null,new ArrayList<>());
 
-		//data for the composants
-		Component parent = new Component("file:resources/fenetre.png", "Fenetre", 0, null,new ArrayList<>());
-
-		//adding the data to the list
-		data.add(parent);
-		data.add(new Component("file:resources/button.png", "button", 1, parent, false, new ArrayList<>(),new ArrayList<>()));
-		data.add(new Component("file:resources/textfield.png", "text field", 2, parent, false, new ArrayList<>(),new ArrayList<>()));
-		data.add(new Component("file:resources/label.png", "label", 3, parent, false, new ArrayList<>(),new ArrayList<>()));
-		data.add(new Component("file:resources/listview.png", "ListView", 4, parent, false, new ArrayList<>(),new ArrayList<>()));
-		data.add(new Component("file:resources/hbox.png", "Hbox", 5, parent, true, new ArrayList<>(),new ArrayList<>()));
-		data.add(new Component("file:resources/vbox.png", "Vbox", 6, parent, true, new ArrayList<>(),new ArrayList<>()));
-		data.add(new Component("file:resources/webview.png", "WebView", 7, parent, false, new ArrayList<>(),new ArrayList<>()));
-		data.add(new Component("file:resources/pane.png", "Pane", 8, parent, true, new ArrayList<>(),new ArrayList<>()));
-		data.add(new Component("file:resources/gridpane.png", "GridPane", 9, parent, true, new ArrayList<>(), new ArrayList<>()));
-		data.add(new Component("file:resources/checkbox.png", "CheckBox", 10, parent,new ArrayList<>()));
-		data.add(new Component("file:resources/borderPane.png", "BorderPane", 11, parent, true, new ArrayList<>(),new ArrayList<>()));
+			//adding the data to the list
+			data.add(parent);
+			data.add(new Component("file:resources/button.png", "button", 1, parent, false, new ArrayList<>(),new ArrayList<>()));
+			data.add(new Component("file:resources/textfield.png", "TextField", 2, parent, false, new ArrayList<>(),new ArrayList<>()));
+			data.add(new Component("file:resources/label.png", "label", 3, parent, false, new ArrayList<>(),new ArrayList<>()));
+			data.add(new Component("file:resources/listview.png", "ListView", 4, parent, false, new ArrayList<>(),new ArrayList<>()));
+			data.add(new Component("file:resources/hbox.png", "Hbox", 5, parent, true, new ArrayList<>(),new ArrayList<>()));
+			data.add(new Component("file:resources/vbox.png", "Vbox", 6, parent, true, new ArrayList<>(),new ArrayList<>()));
+			data.add(new Component("file:resources/webview.png", "WebView", 7, parent, false, new ArrayList<>(),new ArrayList<>()));
+			data.add(new Component("file:resources/pane.png", "Pane", 8, parent, true, new ArrayList<>(),new ArrayList<>()));
+			data.add(new Component("file:resources/gridpane.png", "GridPane", 9, parent, true, new ArrayList<>(), new ArrayList<>()));
+			data.add(new Component("file:resources/checkbox.png", "CheckBox", 10, parent,new ArrayList<>()));
+			data.add(new Component("file:resources/borderPane.png", "BorderPane", 11, parent, true, new ArrayList<>(),new ArrayList<>()));
 
 
-		//la liste des composants
-		list_components.setCellFactory(new ComponentsCell());
-		list_components.setItems(data);
+			//la liste des composants
+			list_components.setCellFactory(new ComponentsCell());
+			list_components.setItems(data);
 
-		list_components.getSelectionModel().selectedItemProperty().addListener(e->{
-			Component c = list_components.getSelectionModel().getSelectedItem();
-			System.out.println(c.toString());
-		});
+			list_components.getSelectionModel().selectedItemProperty().addListener(e->{
+				Component c = list_components.getSelectionModel().getSelectedItem();
+				System.out.println(c.toString());
+			});
 
-		// Add mouse event handlers for the source
-		list_components.setOnDragDetected(new EventHandler <MouseEvent>(){
-			public void handle(MouseEvent event){
-				//System.out.println("Event on Source: drag detected");
-				dragDetected(event, list_components);
-			}
-		});
+			// Add mouse event handlers for the source
+			list_components.setOnDragDetected(new EventHandler <MouseEvent>(){
+				public void handle(MouseEvent event){
+					//System.out.println("Event on Source: drag detected");
+					dragDetected(event, list_components);
+				}
+			});
 
-		list_components.setOnDragOver(new EventHandler <DragEvent>() {
-			public void handle(DragEvent event)
+			list_components.setOnDragOver(new EventHandler <DragEvent>() {
+				public void handle(DragEvent event)
+				{
+					//System.out.println("Event on Source: drag over");
+					dragOver(event, list_components);
+				}
+			});
+
+			list_components.setOnDragDropped(new EventHandler <DragEvent>() {
+				public void handle(DragEvent event)
+				{
+					//System.out.println("Event on Source: drag dropped");
+					dragDropped(event, list_components);
+				}
+			});
+
+			list_components.setOnDragDone(new EventHandler <DragEvent>() {
+				public void handle(DragEvent event)
+				{
+					//System.out.println("Event on Source: drag done");
+					dragDone(event, list_components);
+				}
+			});
+
+			// Add mouse event handlers for the target
+
+			panel.setOnDragOver(new EventHandler <DragEvent>()
 			{
-				//System.out.println("Event on Source: drag over");
-				dragOver(event, list_components);
-			}
-		});
+				public void handle(DragEvent event)
+				{
+					//System.out.println("Event on Target: drag over");
+					panelDragOver(event, panel);
+				}
+			});
 
-		list_components.setOnDragDropped(new EventHandler <DragEvent>() {
-			public void handle(DragEvent event)
+			panel.setOnDragDropped(new EventHandler <DragEvent>()
 			{
-				//System.out.println("Event on Source: drag dropped");
-				dragDropped(event, list_components);
-			}
-		});
+				public void handle(DragEvent event)
+				{
+					//System.out.println("Event on Target: drag dropped");
+					panelDragDropped(event, panel);
+				}
+			});
 
-		list_components.setOnDragDone(new EventHandler <DragEvent>() {
-			public void handle(DragEvent event)
+			panel.setOnDragDone(new EventHandler <DragEvent>()
 			{
-				//System.out.println("Event on Source: drag done");
-				dragDone(event, list_components);
+				public void handle(DragEvent event)
+				{
+					//System.out.println("Event on Target: drag done");
+					panelDragDone(event, panel);
+				}
+			});
+
+			//set the panel change size
+			//DragResizeMod.makeResizable(panel, null);
+
+			//on va recupirer le liste des composants qui se trouve dans le panel (workspace)
+
+			//adding the man layout
+			listItem.add(parent);
+
+			//treeview
+			treeView.setRoot(new TreeItem<>(parent));
+			treeView.setShowRoot(true);
+
+			treeView.getSelectionModel().selectedItemProperty().addListener(e->{
+				desactivateAttributes(false);
+				//panel.setUserData(treeView.getSelectionModel().getSelectedItem().getValue());
+				id.setText(treeView.getSelectionModel().getSelectedItem().getValue().getId_c());
+				showAttributes();
+			});
+
+
+			//mise ajour de la liste
+			updateItemTree();
+
+
+			//initialise the code part with example code
+			//lignes.add("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			//lignes.add("<frame LayoutType='"+getLayout()+"' width='full' height='full'>");
+			//lignes.add("</frame>");
+
+			doc.setRootElement(new Element("frame"));
+	        doc.getRootElement().setAttribute("LayoutType", getLayout());
+	        doc.getRootElement().setAttribute("width", "full");
+	        doc.getRootElement().setAttribute("height", "full");
+
+	        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+	        //output xml to console for debugging
+	        //xmlOutputter.output(doc, System.out);
+	        xmlOutputter.output(doc, new FileOutputStream("output.xml"));
+
+	        refreshCodeFromXml();
+
+			//drag and drop over the frame(treeview) elemnt
+			treeView.setCellFactory(new Callback<TreeView<Component>, TreeCell<Component>>() {
+	            @Override
+	            public TreeCell call(TreeView<Component> param) {
+	                return new DnDCell(Controller.this,param);
+	            }
+	        });
+
+			//la liste des elemnet de type container
+			List<Component> lsContainers = new ArrayList<>();
+			for(Component c:data){
+				if(c.isContainer())
+					lsContainers.add(c);
 			}
-		});
-
-		// Add mouse event handlers for the target
-
-		panel.setOnDragOver(new EventHandler <DragEvent>()
-		{
-			public void handle(DragEvent event)
-			{
-				//System.out.println("Event on Target: drag over");
-				panelDragOver(event, panel);
-			}
-		});
-
-		panel.setOnDragDropped(new EventHandler <DragEvent>()
-		{
-			public void handle(DragEvent event)
-			{
-				//System.out.println("Event on Target: drag dropped");
-				panelDragDropped(event, panel);
-			}
-		});
-
-		panel.setOnDragDone(new EventHandler <DragEvent>()
-		{
-			public void handle(DragEvent event)
-			{
-				//System.out.println("Event on Target: drag done");
-				panelDragDone(event, panel);
-			}
-		});
-
-		//set the panel change size
-		//DragResizeMod.makeResizable(panel, null);
-
-		//on va recupirer le liste des composants qui se trouve dans le panel (workspace)
-
-		//adding the man layout
-		listItem.add(parent);
-
-		//treeview
-		treeView.setRoot(new TreeItem<>(parent));
-		treeView.setShowRoot(true);
-
-		treeView.getSelectionModel().selectedItemProperty().addListener(e->{
-			desactivateAttributes(false);
-			//panel.setUserData(treeView.getSelectionModel().getSelectedItem().getValue());
-			id.setText(treeView.getSelectionModel().getSelectedItem().getValue().getId_c());
-			showAttributes();
-		});
 
 
-		//mise ajour de la liste
-		updateItemTree();
 
+			//input numbers only for width and height
+			width.textProperty().addListener(new ChangeListener<String>() {
+			    @Override
+			    public void changed(ObservableValue<? extends String> observable, String oldValue,
+			        String newValue) {
+			        if (!newValue.matches("\\d*")) {
+			            width.setText(newValue.replaceAll("[^\\d]", ""));
+			        }
+			    }
+			});
+			height.textProperty().addListener(new ChangeListener<String>() {
+			    @Override
+			    public void changed(ObservableValue<? extends String> observable, String oldValue,
+			        String newValue) {
+			        if (!newValue.matches("\\d*")) {
+			            height.setText(newValue.replaceAll("[^\\d]", ""));
+			        }
+			    }
+			});
 
-		//initialise the code part with example code
-		lignes.add("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		lignes.add("<frame LayoutType='"+getLayout()+"' width='full' height='full'>");
-		lignes.add("</frame>");
-
-		//on va modifier le textarea par ces valeurs
-		codeTxt.setText("");
-		codeTxt.setText(lignes.get(0)+"\n");
-		codeTxt.appendText(lignes.get(1)+"\n");
-		for(int i=2;i<lignes.size()-1;i++)
-			codeTxt.appendText("\t"+lignes.get(i)+"\n");
-
-		codeTxt.appendText(lignes.get(lignes.size()-1));
-
-		//drag and drop over the frame(treeview) elemnt
-		treeView.setCellFactory(new Callback<TreeView<Component>, TreeCell<Component>>() {
-            @Override
-            public TreeCell call(TreeView<Component> param) {
-                return new DnDCell(Controller.this,param);
-            }
-        });
-
-		//la liste des elemnet de type container
-		List<Component> lsContainers = new ArrayList<>();
-		for(Component c:data){
-			if(c.isContainer())
-				lsContainers.add(c);
+		}catch(Exception e){
+			e.printStackTrace();
 		}
-		//et on vas appliquer le drag and drap sur toutes les type container
-		//appliquerDragAndDropOnContainer();
-
 	}
 
 	//show les attributs deja attribuer pour cette composant
@@ -442,7 +495,7 @@ public class Controller implements Initializable{
 		if(dragboard.hasContent(COMPONENT_LIST))
 		{
 			ArrayList<Component> list = (ArrayList<Component>)dragboard.getContent(COMPONENT_LIST);
-			//listView.getItems().addAll(list);
+
 			double x = event.getX();
 			double y = event.getY();
 
@@ -451,16 +504,8 @@ public class Controller implements Initializable{
 			c.setId_c("id"+_id);
 			c.getLsAttributes().add(new Attribute("id", "id"+_id));
 
-			//c.setLayoutX(x);
-			//c.setLayoutY(y);
 
 			panel.getChildren().add(getSelectedNodeType(list, x, y));
-
-			/*ImageView compo = new ImageView(c.getImageUrl());
-			compo.setFitHeight(30);
-			compo.setFitWidth(30);
-			compo.setPreserveRatio(true);
-			panel.getChildren().add(compo);*/
 
 
 			//add this componennt to the listitem
@@ -472,93 +517,14 @@ public class Controller implements Initializable{
 			//adding to the tree
 			treeView.getRoot().getChildren().add(new TreeItem<>(c));
 
+			//add the component to file
+			addCompoToJdomFile(c);
 
-			//System.out.println(c.getName());
+			//sync the code visible
+			refreshCodeFromXml();
 
-			//balise existe or no
-			boolean isExist = false;
-			for(String s:lignes){
-				if(s.contains(c.getName()))
-					isExist = true;
-			}
-
-			if(isExist){
-				//hasAttribute
-				boolean hasAttributes = false;
-				for(String s:lignes){
-					if(s.contains("id='"+c.getId_c()+"'") && s.contains("width=''"))
-						hasAttributes = true;
-				}
-				//recupire la ligne a modifier
-				String courant = lignes.get(lignes.size()-1);
-				int index = lignes.size()-1;
-				for(String s:lignes)
-					if(s.contains("id='"+c.getId_c()+"'")){
-						courant = s;
-						index = lignes.indexOf(courant);
-					}
-
-				//if(hasAttributes){
-					//recupirer le nom de la balise
-					String baliseName = courant.split(" ")[0];
-					//les attributs
-					String attributs = "";
-					for(Attribute atr:c.getLsAttributes())
-						attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
-
-					//modifier le courant
-					lignes.set(index, baliseName+" "+attributs+"> </"+baliseName.substring(1));
-
-					//fermer la balise
-					lignes.add("</frame>");
-			}else{
-				//les attributs
-				String attributs = "";
-				for(Attribute atr:c.getLsAttributes())
-					attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
-
-				//modifier le courant
-				lignes.set(lignes.size()-1, "<"+c.getName()+" "+attributs+"> </"+c.getName().substring(1));
-
-				//fermer la balise
-				lignes.add("</frame>");
-			}
-
-			//update the code part
-			codeTxt.setText("");
-			codeTxt.setText(lignes.get(0)+"\n");
-			codeTxt.appendText(lignes.get(1));
-
-			for(int i=2;i<lignes.size()-1;i++)
-				codeTxt.appendText("\n\t"+lignes.get(i));
-
-			codeTxt.appendText("\n"+lignes.get(lignes.size()-1));
-
-			/*/verification au niveau du code
-			String splitting[] = codeTxt.getText().split(" ");
-			String out = "";
-
-			for(int i=0;i<splitting.length;i++){
-				if(!splitting[i].equals("</frame>"))
-					out = out + " " + splitting[i];
-			}
-
-			codeTxt.setText(out+" \n\t <"+c.getName()+" "
-					+ " id='"+c.getId_c()+"' > "
-					+" </"+c.getName()+"> "
-					+ "\n </frame> ");*/
-
-			//adding context menu
-			//initContextMenu(getSelectedNodeType(list, x, y));
 			// Data transfer is successful
 			dragCompleted = true;
-
-			/*/rendre tout les items du panel Resizable
-			for(Node n:panel.getChildren()){
-				DragResizeMod.makeResizable(n);
-				n.resize(n.getLayoutX(), n.getLayoutY());
-
-			}*/
 		}
 
 		// Data transfer is not successful
@@ -692,24 +658,67 @@ public class Controller implements Initializable{
 
 		//selected.setLsAttributes(newAttributes);
 
-		//changes selon les attributs
-
 		//adding attributs to xml code
-		addAttributsToXmlTag(id.getText(), selected);
+		editAttributsToXml(id.getText(), selected);
 
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setContentText("Ok ! Bien Ajouter :) ");
 		alert.setHeaderText("Les attributs sonts bien ajouter a "+selected.getName()+" !");
 		alert.showAndWait();
 	}
-	public void HandleGenerer(){
-		//la liste des element choisis
-		for(TreeItem<Component> tr:treeView.getRoot().getChildren()){
-			System.out.println(tr.getValue().getName());
-		}
+	private void editAttributsToXml(String text, Component selected) {
+		try{
+	        //Get the JDOM document
+	        org.jdom2.Document doc = useSAXParser("output.xml");
 
-		//fermer la frame
-		//codeTxt.appendText("</frame>");
+	        //Get list of component element
+	        Element rootElement = doc.getRootElement();
+	        List<Element> components = rootElement.getChildren();
+
+	        //loop through to edit every Component element
+	        for (Element cp : components) {
+	        	String id = cp.getAttributeValue("id");
+
+	            if (id.equals(selected.getId_c())){
+	            	System.out.println(id);
+
+	            	for(Attribute t:selected.getLsAttributes())
+	            		cp.setAttribute(t.getName(), t.getValue());
+	            }
+	        }
+
+	        //document is processed and edited successfully, lets save it in new file
+	        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+	        xmlOutputter.output(doc, new FileOutputStream("output.xml"));
+
+	        //refresh
+	        refreshCodeFromXml();
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+	}
+
+	public void HandleGenerer(){
+		try{
+			//la liste des element choisis
+			for(TreeItem<Component> tr:treeView.getRoot().getChildren()){
+				System.out.println(tr.getValue().getName());
+			}
+
+			Source xslt = new StreamSource(new File("transform.xsl"));
+	        Source text = new StreamSource(new File("output.xml"));
+	        TransformerFactory factory = TransformerFactory.newInstance();
+	        Transformer transformer = factory.newTransformer(xslt);
+
+
+	        transformer.transform(text, new StreamResult(new File("output.html")));
+
+	        if (Desktop.isDesktopSupported()) {
+	            Desktop.getDesktop().open(new File("output.html"));
+	        }
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	public void HandleSupprimer(){
 		if(treeView.getSelectionModel().getSelectedItem() != null){
@@ -724,30 +733,17 @@ public class Controller implements Initializable{
 				TreeItem<Component> selected = treeView.getSelectionModel().getSelectedItem();
 				// working !!
 				if(selected.getValue().isContainer()){
-
-					for(TreeItem<Component> tc:selected.getChildren()){
-						treeView.getRoot().getChildren().remove(tc);
-						for(String e:lignes){
-							if(e.contains(tc.getValue().getId_c()))
-								lignes.remove(e);
-						}
-						updateText();
-					}
-					treeView.getRoot().getChildren().remove(selected);
-					for(String e:lignes)
-						if(e.contains(selected.getValue().getId_c()))
-							lignes.remove(e);
-
-					updateText();
+					//interdie on doit supprimer tt les sous elts
+					Alert at = new Alert(AlertType.ERROR);
+					at.setContentText("Erreur ! il faut selectionner element par elemnent avant de supprimer le parent");
+					at.setHeaderText("Erreur ! Parent with Childrens !");
+					at.showAndWait();
 				}else{
 					panel.getChildren().remove(treeView.getSelectionModel().getSelectedIndex());
 					treeView.getRoot().getChildren().remove(selected);
 
-					for(String e:lignes){
-						if(e.contains(selected.getValue().getId_c()))
-							lignes.remove(e);
-					}
-					updateText();
+					//remove element from jdom
+					removeCompoFromJdomFile(selected.getValue());
 				}
 
 			} else {
@@ -762,6 +758,130 @@ public class Controller implements Initializable{
 	}
 
 
+	//lire xml file content to textarea
+	void refreshCodeFromXml(){
+		try{
+			File file = new File("output.xml");
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			String text = null;
+
+			codeTxt.setText("");
+			while ((text = reader.readLine()) != null) {
+				codeTxt.appendText(text+"\n");
+			}
+
+			reader.close();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	//Get JDOM document from DOM Parser
+    private void readFile(String fileName){
+        try{
+        	final String file = "output.xml";
+            org.jdom2.Document jdomDoc;
+
+            //we can create JDOM Document from DOM, SAX and STAX Parser Builder classes
+            jdomDoc = useDOMParser(fileName);
+            Element root = jdomDoc.getRootElement();
+            List<Element> empListElements = root.getChildren("Employee");
+
+            /*for (Element empElement : empListElements) {
+                    Employee emp = new Employee();
+                    emp.setId(Integer.parseInt(empElement.getAttributeValue("id")));
+                    emp.setAge(Integer.parseInt(empElement.getChildText("age")));
+                    emp.setName(empElement.getChildText("name"));
+                    emp.setRole(empElement.getChildText("role"));
+                    emp.setGender(empElement.getChildText("gender"));
+                    empList.add(emp);
+                }
+                //lets print Employees list information
+                for (Employee emp : empList)
+                    System.out.println(emp);*/
+        }catch(Exception e){
+        	e.printStackTrace();
+        }
+    }
+    //Get JDOM document from DOM Parser
+    private static org.jdom2.Document useDOMParser(String fileName)
+            throws ParserConfigurationException, SAXException, IOException {
+        //creating DOM Document
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder;
+        dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = (Document) dBuilder.parse(new File(fileName));
+        DOMBuilder domBuilder = new DOMBuilder();
+        return domBuilder.build((org.w3c.dom.Document) doc);
+
+    }
+
+    private void addCompoToJdomFile(Component c){
+    	try{
+	        //Get the JDOM document
+	        org.jdom2.Document doc = useSAXParser("output.xml");
+
+	        //Get list of component element
+	        Element rootElement = doc.getRootElement();
+	        List<Element> components = rootElement.getChildren();
+
+	        //loop through to edit every Component element
+	        for (Element cp : components) {
+	            if (c.getParentCompo().getName() == cp.getName()){
+
+	            }
+	        }
+	        Element elt = new Element(c.getName());
+	        for(Attribute t:c.getLsAttributes())
+	        	elt.setAttribute(t.getName(), t.getValue());
+
+	        elt.setText(c.getName());
+
+	        doc.getRootElement().getChildren().add(elt);
+
+	        //document is processed and edited successfully, lets save it in new file
+	        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+	        xmlOutputter.output(doc, new FileOutputStream("output.xml"));
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+    }
+
+    //remove elemnet from xml
+    private void removeCompoFromJdomFile(Component c){
+    	try{
+	        //Get the JDOM document
+	        org.jdom2.Document doc = useSAXParser("output.xml");
+
+	        //Get list of component element
+	        Element rootElement = doc.getRootElement();
+	        List<Element> components = rootElement.getChildren();
+
+	        //loop through to edit every Component element
+	        for (Element cp : components) {
+	            if (cp.getAttributeValue("id").equals(c.getId_c())){
+	            	rootElement.getChildren().remove(cp);
+	            }
+	        }
+
+	        //document is processed and edited successfully, lets save it in new file
+	        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+	        xmlOutputter.output(doc, new FileOutputStream("output.xml"));
+
+	        //refresh
+	        refreshCodeFromXml();
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+    }
+
+
+    //Get JDOM document from SAX Parser
+    static org.jdom2.Document useSAXParser(String fileName) throws JDOMException,
+            IOException {
+        SAXBuilder saxBuilder = new SAXBuilder();
+        return saxBuilder.build(new File(fileName));
+    }
 
 	/*
 	 *
@@ -791,89 +911,20 @@ public class Controller implements Initializable{
 		if(dragboard.hasContent(COMPONENT_LIST))
 		{
 			ArrayList<Component> list = (ArrayList<Component>)dragboard.getContent(COMPONENT_LIST);
-			//list_components.getItems().addAll(list);
 			double x = event.getX();
 			double y = event.getY();
 
 			Component c = list.get(0);
-			//c.setLayoutX(x);
-			//c.setLayoutY(y);
 
 			_id++;
 			c.setId_c("id"+_id);
 			c.getLsAttributes().add(new Attribute("id", "id"+_id));
 
+			//add the component to file
+			addCompoToJdomFile(c);
 
-			boolean isExist = false;
-			for(String s:lignes){
-				if(s.contains(c.getName()))
-					isExist = true;
-			}
-
-			if(isExist){
-				//hasAttribute
-				boolean hasAttributes = false;
-				for(String s:lignes){
-					if(s.contains("id='"+c.getId_c()+"'") && s.contains("width=''"))
-						hasAttributes = true;
-				}
-				//recupire la ligne a modifier
-				String courant = lignes.get(lignes.size()-1);
-				int index = lignes.size()-1;
-				for(String s:lignes)
-					if(s.contains("id='"+c.getId_c()+"'")){
-						courant = s;
-						index = lignes.indexOf(courant);
-					}
-
-				//if(hasAttributes){
-					//recupirer le nom de la balise
-					String baliseName = courant.split(" ")[0];
-					//les attributs
-					String attributs = "";
-					for(Attribute atr:c.getLsAttributes())
-						attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
-
-					//modifier le courant
-					lignes.set(index, baliseName+" "+attributs+"> </"+baliseName.substring(1)+">");
-
-					//fermer la balise
-					lignes.add("</frame>");
-			}else{
-				//les attributs
-				String attributs = "";
-				for(Attribute atr:c.getLsAttributes())
-					attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
-
-				//modifier le courant
-				lignes.set(lignes.size()-1, "<"+c.getName()+" "+attributs+"> </"+c.getName()+">");
-
-				//fermer la balise
-				lignes.add("</frame>");
-			}
-			//update the code text part
-			codeTxt.setText("");
-			codeTxt.setText(lignes.get(0)+"\n");
-			codeTxt.appendText(lignes.get(1));
-
-			for(int i=2;i<lignes.size()-1;i++)
-				codeTxt.appendText("\n\t"+lignes.get(i));
-
-			codeTxt.appendText("\n"+lignes.get(lignes.size()-1));
-
-			/*/verification au niveau du code
-			String splitting[] = codeTxt.getText().split(" ");
-			String out = "";
-
-			for(int i=0;i<splitting.length;i++){
-				if(!splitting[i].equals("</frame>"))
-					out = out + " " + splitting[i];
-			}
-
-			codeTxt.setText(out+" \n\t <"+c.getName()+" "
-					+ " id='"+c.getId_c()+"' > "
-					+" </"+c.getName()+"> "
-					+"\n </frame> ");*/
+			//sync the code visible
+			refreshCodeFromXml();
 
 
 			//setter le id fixe
@@ -881,32 +932,14 @@ public class Controller implements Initializable{
 
 			panel.getChildren().add(getSelectedNodeType(list, x, y));
 
-			/*ImageView compo = new ImageView(c.getImageUrl());
-			compo.setFitHeight(30);
-			compo.setFitWidth(30);
-			compo.setPreserveRatio(true);
-			panel.getChildren().add(compo);*/
-
 			//add this componennt to the listitem
 			listItem.add(c);
 
 			//adding to the tree
 			treeView.getRoot().getChildren().add(new TreeItem<>(c));
 
-			//String attributs_txt = "";
-			//for(Attribute atr:c.getLsAttributes())
-				//attributs_txt = attributs_txt+" "+atr.getName()+"='"+atr.getValue()+"' ";
-
-			//adding context menu
-			//initContextMenu(getSelectedNodeType(list, x, y));
 			// Data transfer is successful
 			dragCompleted = true;
-
-			/*/rendre tout les items du panel Resizable
-			for(Node n:panel.getChildren()){
-				DragResizeMod.makeResizable(n);
-				n.resize(n.getLayoutX(), n.getLayoutY());
-			}*/
 		}
 
 		// Data transfer is not successful
@@ -968,66 +1001,11 @@ public class Controller implements Initializable{
 	}
 
 
-	//ajouter la liste des attributs a un elemnt xml
-	private void addAttributsToXmlTag(String id, Component c){
-
-		int index = 0;
-		for(String s:lignes){
-			if(s.contains("id='"+id+"'"))
-				index = lignes.indexOf(s);
-		}
-		String attributs = "";
-		for(Attribute atr:c.getLsAttributes())
-			attributs = attributs + " " +atr.getName()+"='"+atr.getValue()+"'";
-
-		lignes.set(index, "<"+c.getName()+" "+attributs+"> </"+c.getName()+">");
-
-		//update the code text part
-		codeTxt.setText("");
-		codeTxt.setText(lignes.get(0)+"\n");
-		codeTxt.appendText(lignes.get(1)+"\n");
-
-		for(int i=2;i<lignes.size()-1;i++)
-			codeTxt.appendText("\t"+lignes.get(i)+"\n");
-
-		codeTxt.appendText(lignes.get(lignes.size()-1));
-	}
-
-	//update text from string exp
-	public void updateText(){
-		codeTxt.setText("");
-		codeTxt.setText(lignes.get(0)+"\n");
-		codeTxt.appendText(lignes.get(1)+"\n");
-		for(int i=2;i<lignes.size()-1;i++)
-			codeTxt.appendText("\t"+lignes.get(i)+"\n");
-
-		codeTxt.appendText(lignes.get(lignes.size()-1));
-	}
-
-	//fermer la balise parente
-	private void closeParentBalise(){
-		String t[] = codeTxt.getText().split(" ");
-		String allTheCode = "";
-
-		for(int i=0;i<t.length-2;i++){
-			allTheCode = allTheCode + " "+ t[i];
-		}
-		allTheCode = allTheCode + "\n </frame> ";
-
-		codeTxt.setText(allTheCode);
-	}
-
 	//getters and setters
 	public void setLayout(String layout) {
 		this.layout = layout;
 	}
 	public String getLayout() {
 		return layout;
-	}
-	public List<String> getLignes() {
-		return lignes;
-	}
-	public void setLignes(List<String> lignes) {
-		this.lignes = lignes;
 	}
 }
